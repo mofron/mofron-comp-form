@@ -1,2 +1,2 @@
-# mofron-parts-form
+# mofron-comp-form
 form component for mofron
