@@ -1,0 +1,22 @@
+{
+  "name": "mofron-comp-form",
+  "version": "0.0.3",
+  "description": "Form Component for mofron",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/simpart/mofron-comp-form.git"
+  },
+  "keywords": [
+    "mofron"
+  ],
+  "author": "simparts",
+  "license": "SEE LICENSE IN LICENSE",
+  "bugs": {
+    "url": "https://github.com/simpart/mofron-comp-form/issues"
+  },
+  "homepage": "https://github.com/simpart/mofron-comp-form#readme"
+}
