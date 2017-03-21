@@ -5,6 +5,7 @@
 
 /**
  * @class Form
+ * @brief form component for mofron
  */
 mofron.comp.Form = class extends mofron.Component {
     /**
@@ -16,7 +17,6 @@ mofron.comp.Form = class extends mofron.Component {
     constructor (prm_opt) {
         try {
             super();
-            this.name('Form');
             
             this.m_callback = new Array(null,null);
             this.m_req      = false;
@@ -30,6 +30,7 @@ mofron.comp.Form = class extends mofron.Component {
     
     initDomConts (prm) {
         try {
+            this.name('Form');
             super.initDomConts();
         } catch (e) {
             console.error(e.stack);
@@ -47,9 +48,8 @@ mofron.comp.Form = class extends mofron.Component {
             if ('function' !== typeof cb_func) {
                 throw new Error('invalid parameter');
             }
-            var prm = (undefined === cb_prm) ? null : cb_prm;
             this.m_callback[0] = cb_func;
-            this.m_callback[1] = prm;
+            this.m_callback[1] = (undefined === cb_prm) ? null : cb_prm;
         } catch (e) {
             console.error(e.stack);
             throw e;
@@ -59,14 +59,17 @@ mofron.comp.Form = class extends mofron.Component {
     send () {
         try {
            if (0 === this.child().length) {
-               throw new Error('there is no element');
+               return {
+                   index : -1,
+                   cause : 'form is no element'
+               };
            }
            var ret_chk = this.checkValue();
            if (null !== ret_chk) {
-               throw new Error(ret_chk.check + ' at index ' + ret_chk.index);
+               return ret_chk;
            }
            
-           var cb = this.callback();
+           var cb  = this.callback();
            var xhr = new XMLHttpRequest();
            xhr.addEventListener('load', function(event) {
                if (null != cb[0]) {
@@ -75,6 +78,7 @@ mofron.comp.Form = class extends mofron.Component {
            });
            xhr.open('POST', this.m_param);
            xhr.send(JSON.stringify(this.value()));
+           return null;
         } catch (e) {
             console.error(e.stack);
             throw e;
@@ -97,14 +101,14 @@ mofron.comp.Form = class extends mofron.Component {
                        (undefined === chd[idx].value()) ) ) {
                     return {
                         index : form_idx,
-                        check : "emply value"
+                        cause : "emply value"
                     }
                 }
                 ret_chk = chd[idx].checkValue();
                 if (null !== ret_chk) {
                     return {
-                        index  : form_idx,
-                        check  : ret_chk
+                        index : form_idx,
+                        cause : ret_chk
                     }
                 }
                 
@@ -151,4 +155,5 @@ mofron.comp.Form = class extends mofron.Component {
         }
     }
 }
-module.exports = mofron.comp.Form;
+mofron.comp.form = {};
+module.exports   = mofron.comp.Form;
