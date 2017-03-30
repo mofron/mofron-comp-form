@@ -126,7 +126,7 @@ mofron.comp.Form = class extends mofron.Component {
         try {
             if (undefined === flg) {
                 /* getter */
-                return (undefined === this.m_req) false : this.m_req;
+                return (undefined === this.m_req) ? false : this.m_req;
             }
             /* setter */
             if ('boolean' !== typeof flg) {
