@@ -8,25 +8,6 @@
  * @brief form component for mofron
  */
 mofron.comp.Form = class extends mofron.Component {
-    /**
-     * initialize form component
-     * 
-     * @param prm_opt (string) send uri
-     * @param prm_opt (object) option object of key-value
-     */
-    constructor (prm_opt) {
-        try {
-            super();
-            
-            this.m_callback = new Array(null,null);
-            this.m_req      = false;
-            
-            this.prmOpt(prm_opt);
-        } catch (e) {
-            console.error(e.stack);
-            throw e;
-        }
-    }
     
     initDomConts (prm) {
         try {
@@ -42,11 +23,14 @@ mofron.comp.Form = class extends mofron.Component {
         try {
             if (undefined === cb_func) {
                 /* getter */
-                return this.m_callback;
+                return (undefined === this.m_callback) ? new Array(null,null) : this.m_callback;
             }
             /* setter */
             if ('function' !== typeof cb_func) {
                 throw new Error('invalid parameter');
+            }
+            if (undefined === this.m_callback) {
+                this.m_callback = new Array(null,null);
             }
             this.m_callback[0] = cb_func;
             this.m_callback[1] = (undefined === cb_prm) ? null : cb_prm;
@@ -56,7 +40,7 @@ mofron.comp.Form = class extends mofron.Component {
         }
     }
     
-    send () {
+    send (url) {
         try {
            if (0 === this.child().length) {
                return {
@@ -76,7 +60,7 @@ mofron.comp.Form = class extends mofron.Component {
                    cb[0](JSON.parse(this.response), cb[1]);
                }
            });
-           xhr.open('POST', this.m_param);
+           xhr.open('POST', (undefined === url) ? this.m_param : url);
            xhr.send(JSON.stringify(this.value()));
            return null;
         } catch (e) {
@@ -142,7 +126,7 @@ mofron.comp.Form = class extends mofron.Component {
         try {
             if (undefined === flg) {
                 /* getter */
-                return this.m_req;
+                return (undefined === this.m_req) false : this.m_req;
             }
             /* setter */
             if ('boolean' !== typeof flg) {
