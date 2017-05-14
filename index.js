@@ -2,36 +2,23 @@
  * @file mofron-comp-form/index.js
  * @author simpart
  */
+require('mofron-comp-button');
+require('mofron-layout-margin');
+require('mofron-layout-hrzcenter');
 
 /**
  * @class Form
  * @brief form component for mofron
  */
 mofron.comp.Form = class extends mofron.Component {
-    /**
-     * initialize form component
-     * 
-     * @param prm_opt (string) send uri
-     * @param prm_opt (object) option object of key-value
-     */
-    constructor (prm_opt) {
+    
+    constructor (opt) {
         try {
             super();
-            
-            this.m_callback = new Array(null,null);
-            this.m_req      = false;
-            
-            this.prmOpt(prm_opt);
-        } catch (e) {
-            console.error(e.stack);
-            throw e;
-        }
-    }
-    
-    initDomConts (prm) {
-        try {
             this.name('Form');
-            super.initDomConts();
+            this.m_setmsg = false;
+            this.m_setbtn = false;
+            this.prmOpt(opt);
         } catch (e) {
             console.error(e.stack);
             throw e;
@@ -42,11 +29,14 @@ mofron.comp.Form = class extends mofron.Component {
         try {
             if (undefined === cb_func) {
                 /* getter */
-                return this.m_callback;
+                return (undefined === this.m_callback) ? new Array(null,null) : this.m_callback;
             }
             /* setter */
             if ('function' !== typeof cb_func) {
                 throw new Error('invalid parameter');
+            }
+            if (undefined === this.m_callback) {
+                this.m_callback = new Array(null,null);
             }
             this.m_callback[0] = cb_func;
             this.m_callback[1] = (undefined === cb_prm) ? null : cb_prm;
@@ -76,7 +66,12 @@ mofron.comp.Form = class extends mofron.Component {
                    cb[0](JSON.parse(this.response), cb[1]);
                }
            });
-           xhr.open('POST', this.m_param);
+           
+           var send_uri = (undefined === this.uri()) ? this.m_param : this.uri();
+           if (null === send_uri) {
+               throw new Error('invalid parameter');
+           }
+           xhr.open('POST', send_uri);
            xhr.send(JSON.stringify(this.value()));
            return null;
         } catch (e) {
@@ -85,8 +80,26 @@ mofron.comp.Form = class extends mofron.Component {
         }
     }
     
+    uri (u) {
+        try {
+            if (undefined === u) {
+                /* getter */
+                return (undefined === this.m_uri) ? null : this.m_uri;
+            }
+            /* setter */
+            if ('string' !== typeof u) {
+                throw new Error('invalid parameter');
+            }
+            this.m_uri = u;
+        } catch (e) {
+            console.error(e.stack);
+            throw e;
+        }
+    }
+    
     checkValue () {
         try {
+            this.message('&nbsp;');
             var chd      = this.child();
             var ret_chk  = null;
             var form_idx = 0;
@@ -101,7 +114,7 @@ mofron.comp.Form = class extends mofron.Component {
                        (undefined === chd[idx].value()) ) ) {
                     return {
                         index : form_idx,
-                        cause : "emply value"
+                        cause : 'emply value'
                     }
                 }
                 ret_chk = chd[idx].checkValue();
@@ -142,13 +155,123 @@ mofron.comp.Form = class extends mofron.Component {
         try {
             if (undefined === flg) {
                 /* getter */
-                return this.m_req;
+                return (undefined === this.m_req) ? false : this.m_req;
             }
             /* setter */
             if ('boolean' !== typeof flg) {
                 throw new Error('invalid parameter');
             }
             this.m_req = flg;
+        } catch (e) {
+            console.error(e.stack);
+            throw e;
+        }
+    }
+    
+    message (msg) {
+        try {
+            if (undefined === msg) {
+                /* getter */
+                if (undefined === this.m_message) {
+                    var set_msg = this.theme().component('mofron-comp-text');
+                    this.message(
+                        new set_msg({
+                            text  : '&nbsp;'
+                        })
+                    );
+                }
+                return this.m_message;
+            }
+            /* setter */
+            if (true === mofron.func.isInclude(msg, 'Text')) {
+                msg.color(new mofron.Color(255,0,0));
+                this.m_message = msg;
+            } else if ('string' === typeof msg) {
+                this.message().text(msg);
+            } else {
+                throw new Error('invalid parameter');
+            }
+        } catch (e) {
+            console.error(e.stack);
+            throw e;
+        }
+    }
+    
+    button (btn_str) {
+        try {
+            if (undefined === btn_str) {
+                /* getter */
+                if (undefined === this.m_button) {
+                    var Btn = this.theme().component('mofron-comp-button');
+                    this.button(new Btn('Send'));
+                }
+                return this.m_button;
+            }
+            /* setter */
+            if (true === mofron.func.isInclude(btn_str, 'Button')) {
+                var wrp = new mofron.Component({
+                              addChild : btn_str,
+                              style    : {
+                                             width    : (null === btn_str.width()) ? '100px' : btn_str.width() + 'px',
+                                             'margin-left' : 'auto'
+                                         }
+                          });
+                btn_str.width((null === btn_str.width()) ? 100 : undefined);
+                btn_str.clickEvent(
+                    function (frm) {
+                        try {
+                            var ret = frm.send();
+                            if (null !== ret) {
+                                frm.message(ret['cause']);
+                            }
+                        } catch (e) {
+                            console.error(e.stack);
+                            throw e;
+                        }
+                    },
+                    this
+                );
+                this.m_button = btn_str;
+            } else if ('string' === typeof btn_str) {
+                this.button().text(btn_str);
+            } else {
+                throw new Error('invalid parameter');
+            }
+        } catch (e) {
+            console.error(e.stack);
+            throw e;
+        }
+    }
+    
+    addChild (chd, disp, idx) {
+        try {
+            if (true === mofron.func.isObject(this, 'Form')) {
+                if (0 === this.layout().length) {
+                    /* set default layout */
+                    this.layout([
+                        new mofron.layout.Margin('top', 25),
+                        new mofron.layout.HrzCenter({
+                            type : 'padding',
+                            rate : 70
+                        })
+                    ]);
+                }
+            
+                if (false === this.m_setmsg) {
+                    this.m_setmsg = true;
+                    super.addChild(this.message());
+                }
+                
+                if (false === this.m_setbtn) {
+                    this.m_setbtn = true;
+                    super.addChild(
+                        new mofron.Component({
+                            addChild : this.button().parent(),
+                        })
+                    );
+                }
+            }
+            super.addChild(chd, disp, (undefined === idx) ? this.child().length-1 : idx);
         } catch (e) {
             console.error(e.stack);
             throw e;
