@@ -1,6 +1,10 @@
 {
   "name": "mofron-comp-form",
+<<<<<<< HEAD
   "version": "0.2.0",
+=======
+  "version": "0.1.1",
+>>>>>>> 791a7a617701840787113f813991c3113418e4bc
   "description": "Form Component for mofron",
   "main": "index.js",
   "scripts": {

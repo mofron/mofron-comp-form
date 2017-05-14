@@ -46,7 +46,7 @@ mofron.comp.Form = class extends mofron.Component {
         }
     }
     
-    send () {
+    send (url) {
         try {
            if (0 === this.child().length) {
                return {
@@ -66,7 +66,6 @@ mofron.comp.Form = class extends mofron.Component {
                    cb[0](JSON.parse(this.response), cb[1]);
                }
            });
-           
            var send_uri = (undefined === this.uri()) ? this.m_param : this.uri();
            if (null === send_uri) {
                throw new Error('invalid parameter');
