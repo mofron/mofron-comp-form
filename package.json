@@ -1,6 +1,6 @@
 {
   "name": "mofron-comp-form",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Form Component for mofron",
   "main": "index.js",
   "scripts": {
@@ -9,6 +9,10 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/simpart/mofron-comp-form.git"
+  },
+  "dependencies": {
+    "mofron-layout-margin" : "",
+    "mofron-layout-hrzcenter" : ""
   },
   "keywords": [
     "mofron"
