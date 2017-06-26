@@ -217,7 +217,7 @@ mofron.comp.Form = class extends mofron.Component {
                           });
                 btn_str.width((null === btn_str.width()) ? 100 : undefined);
                 btn_str.clickEvent(
-                    function (frm) {
+                    function (tgt, frm) {
                         try {
                             var ret = frm.send();
                             if (null !== ret) {
