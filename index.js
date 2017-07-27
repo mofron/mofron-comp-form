@@ -5,6 +5,7 @@
 require('mofron-comp-button');
 require('mofron-layout-margin');
 require('mofron-layout-hrzcenter');
+let crypto = require("crypto");
 
 /**
  * @class Form
@@ -71,8 +72,54 @@ mofron.comp.Form = class extends mofron.Component {
                throw new Error('invalid parameter');
            }
            xhr.open('POST', send_uri);
-           xhr.send(JSON.stringify(this.value()));
+           let val = this.value();
+
+           if (null !== this.hash()) {
+               for(let vidx in val) {
+                   let cipher = crypto.createCipher(
+                                    this.hash()[0],
+                                    this.hash()[1]
+                                );
+                   let ctxt   = cipher.update(
+                                    val[vidx],
+                                    'utf8',
+                                    'hex'
+                                );
+                   ctxt      += cipher.final('hex');
+                   val[vidx]  = ctxt;
+               }
+           }
+           xhr.send(JSON.stringify(val));
            return null;
+        } catch (e) {
+            console.error(e.stack);
+            throw e;
+        }
+    }
+    
+    hash (tp, key) {
+        try {
+            if (undefined === tp) {
+                /* getter */
+                return (undefined === this.m_hash) ? null : this.m_hash;
+            }
+            /* setter */
+            if ( ('string' !== typeof tp) ||
+                 ('string' !== typeof key) ) {
+                throw new Error('invalid parameter');
+            }
+            let clist = crypto.getCiphers();
+            let hit   = false;
+            for (let cidx in clist) {
+                if (tp === clist[cidx]) {
+                    hit = true;
+                    break;
+                }
+            }
+            if (false === hit) {
+                throw new Error('invalid parameter');
+            }
+            this.m_hash = [ tp, key ];
         } catch (e) {
             console.error(e.stack);
             throw e;
