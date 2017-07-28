@@ -72,24 +72,40 @@ mofron.comp.Form = class extends mofron.Component {
                throw new Error('invalid parameter');
            }
            xhr.open('POST', send_uri);
-           let val = this.value();
-
+           let val     = this.value();
+           let set_val = {};
+           let cipher  = null;
+           let cval    = null;
+           let ckey    = null;
            if (null !== this.hash()) {
                for(let vidx in val) {
-                   let cipher = crypto.createCipher(
-                                    this.hash()[0],
-                                    this.hash()[1]
-                                );
-                   let ctxt   = cipher.update(
-                                    val[vidx],
-                                    'utf8',
-                                    'hex'
-                                );
-                   ctxt      += cipher.final('hex');
-                   val[vidx]  = ctxt;
+                   /* encryption key */
+                   cipher = crypto.createCipher(
+                                this.hash()[0],
+                                this.hash()[1]
+                            );
+                   ckey   = cipher.update(
+                                vidx,
+                                'utf8',
+                                'hex'
+                            );
+                   ckey  += cipher.final('hex');
+                   
+                   /* encryption value */
+                   cipher = crypto.createCipher(
+                                this.hash()[0],
+                                this.hash()[1]
+                            );
+                   cval   = cipher.update(
+                                val[vidx],
+                                'utf8',
+                                'hex'
+                            );
+                   cval          += cipher.final('hex');
+                   set_val[ckey]  = cval;
                }
            }
-           xhr.send(JSON.stringify(val));
+           xhr.send(JSON.stringify(set_val));
            return null;
         } catch (e) {
             console.error(e.stack);
@@ -182,20 +198,42 @@ mofron.comp.Form = class extends mofron.Component {
     
     value () {
         try {
-            var ret_val = new Array();
-            var chd     = this.child();
+            let ret_val = {};
+            let chd     = this.child();
+            let val_nm  = null;
             for (var idx in chd) {
                 if (true !== mofron.func.isInclude(chd[idx], 'Form')) {
                     continue;
                 }
-                ret_val.push(chd[idx].value());
+                val_nm = chd[idx].valueName();
+                if (null === val_nm) {
+                    val_nm = 'prm_' + idx;
+                }
+                ret_val[val_nm] = chd[idx].value();
             }
             return ret_val;
         } catch (e) {
             console.error(e.stack);
             throw e;
         }
-    } 
+    }
+    
+    valueName (nm) {
+        try {
+            if (undefined === nm) {
+                /* getter */
+                return (undefined === this.m_valname) ? null : this.m_valname;
+            }
+            /* setter */
+            if ('string' !== typeof nm) {
+                throw new Error('invalid parameter');
+            }
+            this.m_valname = nm;
+        } catch (e) {
+            console.error(e.stack);
+            throw e;
+        }
+    }
     
     require (flg) {
         try {
@@ -256,12 +294,12 @@ mofron.comp.Form = class extends mofron.Component {
             /* setter */
             if (true === mofron.func.isInclude(btn_str, 'Button')) {
                 var wrp = new mofron.Component({
-                              addChild : btn_str,
-                              style    : {
-                                             width    : (null === btn_str.width()) ? '100px' : btn_str.width() + 'px',
-                                             'margin-left' : 'auto'
-                                         }
-                          });
+                    addChild : btn_str,
+                    style    : {
+                        width  : (null === btn_str.width()) ? '100px' : btn_str.width() + 'px',
+                                     'margin-left' : 'auto'
+                    }
+                });
                 btn_str.width((null === btn_str.width()) ? 100 : undefined);
                 btn_str.clickEvent(
                     function (tgt, frm) {
