@@ -129,7 +129,7 @@ mofron.comp.Form = class extends mofron.Component {
     
     checkValue () {
         try {
-            this.message('&nbsp;');
+            this.message(null);
             var chd      = this.child();
             var ret_chk  = null;
             var form_idx = 0;
@@ -240,7 +240,9 @@ mofron.comp.Form = class extends mofron.Component {
                 this.m_message = msg;
             } else if ('string' === typeof msg) {
                 this.message().text(msg);
-                this.message().visible(((null === msg) || ('' === msg)) ? false : true)
+                this.message().visible(('' === msg) ? false : true);
+            } else if (null === msg) {
+                this.message().visible(false);
             } else {
                 throw new Error('invalid parameter');
             }
