@@ -3,9 +3,9 @@
  * @author simpart
  */
 require('mofron-comp-button');
-require('mofron-layout-margin');
-require('mofron-layout-hrzcenter');
-let crypto = require("crypto");
+require('mofron-comp-message');
+let Margin  = require('mofron-layout-margin');
+let Center  = require('mofron-layout-hrzcenter');
 
 /**
  * @class Form
@@ -26,21 +26,21 @@ mofron.comp.Form = class extends mofron.Component {
         }
     }
     
-    callback (cb_func, cb_prm) {
+    callback (func, prm) {
         try {
-            if (undefined === cb_func) {
+            if (undefined === func) {
                 /* getter */
                 return (undefined === this.m_callback) ? new Array(null,null) : this.m_callback;
             }
             /* setter */
-            if ('function' !== typeof cb_func) {
+            if ('function' !== typeof func) {
                 throw new Error('invalid parameter');
             }
             if (undefined === this.m_callback) {
                 this.m_callback = new Array(null,null);
             }
-            this.m_callback[0] = cb_func;
-            this.m_callback[1] = (undefined === cb_prm) ? null : cb_prm;
+            this.m_callback[0] = func;
+            this.m_callback[1] = (undefined === prm) ? null : prm;
         } catch (e) {
             console.error(e.stack);
             throw e;
@@ -72,40 +72,20 @@ mofron.comp.Form = class extends mofron.Component {
                throw new Error('invalid parameter');
            }
            xhr.open('POST', send_uri);
-           let val     = this.value();
-           let set_val = {};
-           let cipher  = null;
-           let cval    = null;
-           let ckey    = null;
-           if (null !== this.hash()) {
-               for(let vidx in val) {
-                   /* encryption key */
-                   cipher = crypto.createCipher(
-                                this.hash()[0],
-                                this.hash()[1]
-                            );
-                   ckey   = cipher.update(
-                                vidx,
-                                'utf8',
-                                'hex'
-                            );
-                   ckey  += cipher.final('hex');
-                   
-                   /* encryption value */
-                   cipher = crypto.createCipher(
-                                this.hash()[0],
-                                this.hash()[1]
-                            );
-                   cval   = cipher.update(
-                                val[vidx],
-                                'utf8',
-                                'hex'
-                            );
-                   cval          += cipher.final('hex');
-                   set_val[ckey]  = cval;
+           let send_val = this.value();
+           
+           /* check hash function */
+           let hash_fnc = this.hash();
+           if (null !== hash_fnc) {
+               let upd_key,upd_val;
+               for (let vidx in send_val) {
+                   upd_key = hash_fnc(vidx);
+                   upd_val = hash_fnc(send_val[vidx]);
+                   send_val[upd_key] = upd_val;
                }
            }
-           xhr.send(JSON.stringify(set_val));
+           
+           xhr.send(JSON.stringify(send_val));
            return null;
         } catch (e) {
             console.error(e.stack);
@@ -113,29 +93,17 @@ mofron.comp.Form = class extends mofron.Component {
         }
     }
     
-    hash (tp, key) {
+    hash (func) {
         try {
-            if (undefined === tp) {
+            if (undefined === func) {
                 /* getter */
                 return (undefined === this.m_hash) ? null : this.m_hash;
             }
             /* setter */
-            if ( ('string' !== typeof tp) ||
-                 ('string' !== typeof key) ) {
+            if ('function' !== typeof tp) {
                 throw new Error('invalid parameter');
             }
-            let clist = crypto.getCiphers();
-            let hit   = false;
-            for (let cidx in clist) {
-                if (tp === clist[cidx]) {
-                    hit = true;
-                    break;
-                }
-            }
-            if (false === hit) {
-                throw new Error('invalid parameter');
-            }
-            this.m_hash = [ tp, key ];
+            this.m_hash = func;
         } catch (e) {
             console.error(e.stack);
             throw e;
@@ -257,18 +225,18 @@ mofron.comp.Form = class extends mofron.Component {
             if (undefined === msg) {
                 /* getter */
                 if (undefined === this.m_message) {
-                    var set_msg = this.theme().component('mofron-comp-text');
+                    var set_msg = this.theme().component('mofron-comp-message');
                     this.message(
                         new set_msg({
-                            text  : '&nbsp;'
+                            text  : '',
+                            color : new mofron.Color(200,60,60)
                         })
                     );
                 }
                 return this.m_message;
             }
             /* setter */
-            if (true === mofron.func.isInclude(msg, 'Text')) {
-                msg.color(new mofron.Color(255,0,0));
+            if (true === mofron.func.isInclude(msg, 'Message')) {
                 this.m_message = msg;
             } else if ('string' === typeof msg) {
                 this.message().text(msg);
@@ -281,27 +249,27 @@ mofron.comp.Form = class extends mofron.Component {
         }
     }
     
-    button (btn_str) {
+    submitComp (sub) {
         try {
-            if (undefined === btn_str) {
+            if (undefined === sub) {
                 /* getter */
-                if (undefined === this.m_button) {
-                    var Btn = this.theme().component('mofron-comp-button');
-                    this.button(new Btn('Send'));
+                if (undefined === this.m_submit) {
+                    var btn = this.theme().component('mofron-comp-button');
+                    this.submitComp(new btn('Send'));
                 }
-                return this.m_button;
+                return this.m_submit;
             }
             /* setter */
-            if (true === mofron.func.isInclude(btn_str, 'Button')) {
+            if (true === mofron.func.isInclude(sub, 'Button')) {
                 var wrp = new mofron.Component({
-                    addChild : btn_str,
+                    addChild : sub,
                     style    : {
-                        width  : (null === btn_str.width()) ? '100px' : btn_str.width() + 'px',
+                        width  : (null === sub.width()) ? '100px' : sub.width() + 'px',
                                      'margin-left' : 'auto'
                     }
                 });
-                btn_str.width((null === btn_str.width()) ? 100 : undefined);
-                btn_str.clickEvent(
+                sub.width((null === sub.width()) ? 100 : undefined);
+                sub.clickEvent(
                     function (tgt, frm) {
                         try {
                             var ret = frm.send();
@@ -315,9 +283,9 @@ mofron.comp.Form = class extends mofron.Component {
                     },
                     this
                 );
-                this.m_button = btn_str;
-            } else if ('string' === typeof btn_str) {
-                this.button().text(btn_str);
+                this.m_submit = sub;
+            } else if ('string' === typeof sub) {
+                this.submitComp().text(sub);
             } else {
                 throw new Error('invalid parameter');
             }
@@ -333,24 +301,21 @@ mofron.comp.Form = class extends mofron.Component {
                 if (0 === this.layout().length) {
                     /* set default layout */
                     this.layout([
-                        new mofron.layout.Margin('top', 25),
-                        new mofron.layout.HrzCenter({
-                            type : 'padding',
-                            rate : 70
-                        })
+                        new Margin('top', 25),
+                        new Center({ rate : 70 })
                     ]);
                 }
             
                 if (false === this.m_setmsg) {
                     this.m_setmsg = true;
-                    super.addChild(this.message());
+                    super.addChild(this.message(), false);
                 }
                 
                 if (false === this.m_setbtn) {
                     this.m_setbtn = true;
                     super.addChild(
                         new mofron.Component({
-                            addChild : this.button().parent(),
+                            addChild : this.submitComp().parent(),
                         })
                     );
                 }
