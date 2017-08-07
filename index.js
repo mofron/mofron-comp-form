@@ -240,6 +240,7 @@ mofron.comp.Form = class extends mofron.Component {
                 this.m_message = msg;
             } else if ('string' === typeof msg) {
                 this.message().text(msg);
+                this.message().visible(((null === msg) || ('' === msg)) ? false : true)
             } else {
                 throw new Error('invalid parameter');
             }
