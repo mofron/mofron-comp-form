@@ -264,16 +264,18 @@ mofron.comp.Form = class extends mofron.Component {
             }
             /* setter */
             if (true === mofron.func.isInclude(sub, 'Button')) {
-                var wrp = new mofron.Component({
-                    addChild : sub,
-                    style    : {
-                        width  : (null === sub.width()) ? '100px' : sub.width() + 'px',
-                                     'margin-left' : 'auto'
-                    }
+                new mofron.Component({
+                    addChild : new mofron.Component({
+                        addChild : sub,
+                        style    : {
+                            width  : (null === sub.width()) ? '100px' : sub.width() + 'px',
+                                         'margin-left' : 'auto'
+                        }
+                    })
                 });
                 sub.width((null === sub.width()) ? 100 : undefined);
                 sub.clickEvent(
-                    function (tgt, frm) {
+                    (tgt, frm) => {
                         try {
                             var ret = frm.send();
                             if (null !== ret) {
@@ -316,11 +318,8 @@ mofron.comp.Form = class extends mofron.Component {
                 
                 if (false === this.m_setbtn) {
                     this.m_setbtn = true;
-                    super.addChild(
-                        new mofron.Component({
-                            addChild : this.submitComp().parent(),
-                        })
-                    );
+                    let sub       = this.submitComp();
+                    super.addChild(sub.parent().parent());
                 }
             }
             super.addChild(chd, disp, (undefined === idx) ? this.child().length-1 : idx);
