@@ -60,11 +60,12 @@ mofron.comp.Form = class extends mofron.Component {
                return ret_chk;
            }
            
-           var cb  = this.callback();
-           var xhr = new XMLHttpRequest();
+           var cb   = this.callback();
+           var xhr  = new XMLHttpRequest();
+           let form = this;
            xhr.addEventListener('load', function(event) {
                if (null != cb[0]) {
-                   cb[0](JSON.parse(this.response), cb[1]);
+                   cb[0](JSON.parse(this.response), form, cb[1]);
                }
            });
            var send_uri = (undefined === this.uri()) ? this.m_param : this.uri();
