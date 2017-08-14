@@ -304,26 +304,35 @@ mofron.comp.Form = class extends mofron.Component {
     addChild (chd, disp, idx) {
         try {
             if (true === mofron.func.isObject(this, 'Form')) {
-                if (0 === this.layout().length) {
-                    /* set default layout */
-                    this.layout([
-                        new Margin('top', 25),
-                        new Center({ rate : 70 })
-                    ]);
-                }
-            
-                if (false === this.m_setmsg) {
-                    this.m_setmsg = true;
-                    super.addChild(this.message(), false);
-                }
-                
-                if (false === this.m_setbtn) {
-                    this.m_setbtn = true;
-                    let sub       = this.submitComp();
-                    super.addChild(sub.parent().parent());
-                }
+                this.initFormComp();
             }
             super.addChild(chd, disp, (undefined === idx) ? this.child().length-1 : idx);
+        } catch (e) {
+            console.error(e.stack);
+            throw e;
+        }
+    }
+    
+    initFormComp () {
+        try {
+            if (0 === this.layout().length) {
+                /* set default layout */
+                this.layout([
+                    new Margin('top', 25),
+                    new Center({ rate : 70 })
+                ]);
+            }
+            
+            if (false === this.m_setmsg) {
+                this.m_setmsg = true;
+                super.addChild(this.message(), false);
+            }
+            
+            if (false === this.m_setbtn) {
+                this.m_setbtn = true;
+                let sub       = this.submitComp();
+                super.addChild(sub.parent().parent());
+            }
         } catch (e) {
             console.error(e.stack);
             throw e;
