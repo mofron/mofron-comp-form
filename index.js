@@ -2,8 +2,8 @@
  * @file mofron-comp-form/index.js
  * @author simpart
  */
-require('mofron-comp-button');
-require('mofron-comp-message');
+let Button = require('mofron-comp-button');
+let Message = require('mofron-comp-message');
 let Margin  = require('mofron-layout-margin');
 let Center  = require('mofron-layout-hrzcenter');
 
@@ -226,9 +226,8 @@ mofron.comp.Form = class extends mofron.Component {
             if (undefined === msg) {
                 /* getter */
                 if (undefined === this.m_message) {
-                    var set_msg = this.theme().component('mofron-comp-message');
                     this.message(
-                        new set_msg({
+                        new Message({
                             text  : '',
                             color : new mofron.Color(200,60,60)
                         })
@@ -258,8 +257,7 @@ mofron.comp.Form = class extends mofron.Component {
             if (undefined === sub) {
                 /* getter */
                 if (undefined === this.m_submit) {
-                    var btn = this.theme().component('mofron-comp-button');
-                    this.submitComp(new btn('Send'));
+                    this.submitComp(new Button('Send'));
                 }
                 return this.m_submit;
             }

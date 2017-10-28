@@ -1,6 +1,6 @@
 {
   "name": "mofron-comp-form",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "Form Component for mofron",
   "main": "index.js",
   "scripts": {
@@ -8,19 +8,19 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/simpart/mofron-comp-form.git"
+    "url": "git+https://github.com/mofron/mofron-comp-form.git"
   },
   "dependencies": {
     "mofron-layout-margin" : "",
     "mofron-layout-hrzcenter" : ""
   },
   "keywords": [
-    "mofron"
+    "front-end"
   ],
   "author": "simparts",
   "license": "SEE LICENSE IN LICENSE",
   "bugs": {
-    "url": "https://github.com/simpart/mofron-comp-form/issues"
+    "url": "https://github.com/mofron/mofron-comp-form/issues"
   },
-  "homepage": "https://github.com/simpart/mofron-comp-form#readme"
+  "homepage": "https://github.com/mofron/mofron-comp-form#readme"
 }
