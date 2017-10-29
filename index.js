@@ -76,15 +76,15 @@ mofron.comp.Form = class extends mofron.Component {
            let send_val = this.value();
            
            /* check hash function */
-           let hash_fnc = this.hash();
-           if (null !== hash_fnc) {
-               let upd_key,upd_val;
-               for (let vidx in send_val) {
-                   upd_key = hash_fnc(vidx);
-                   upd_val = hash_fnc(send_val[vidx]);
-                   send_val[upd_key] = upd_val;
-               }
-           }
+           //let hash_fnc = this.hash();
+           //if (null !== hash_fnc) {
+           //    let upd_key,upd_val;
+           //    for (let vidx in send_val) {
+           //        upd_key = hash_fnc(vidx);
+           //        upd_val = hash_fnc(send_val[vidx]);
+           //        send_val[upd_key] = upd_val;
+           //    }
+           //}
            
            xhr.send(JSON.stringify(send_val));
            return null;
@@ -94,22 +94,22 @@ mofron.comp.Form = class extends mofron.Component {
         }
     }
     
-    hash (func) {
-        try {
-            if (undefined === func) {
-                /* getter */
-                return (undefined === this.m_hash) ? null : this.m_hash;
-            }
-            /* setter */
-            if ('function' !== typeof tp) {
-                throw new Error('invalid parameter');
-            }
-            this.m_hash = func;
-        } catch (e) {
-            console.error(e.stack);
-            throw e;
-        }
-    }
+    //hash (func) {
+    //    try {
+    //        if (undefined === func) {
+    //            /* getter */
+    //            return (undefined === this.m_hash) ? null : this.m_hash;
+    //        }
+    //        /* setter */
+    //        if ('function' !== typeof tp) {
+    //            throw new Error('invalid parameter');
+    //        }
+    //        this.m_hash = func;
+    //    } catch (e) {
+    //        console.error(e.stack);
+    //        throw e;
+    //    }
+    //}
     
     uri (u) {
         try {
@@ -228,8 +228,9 @@ mofron.comp.Form = class extends mofron.Component {
                 if (undefined === this.m_message) {
                     this.message(
                         new Message({
-                            text  : '',
-                            color : new mofron.Color(200,60,60)
+                            text    : '',
+                            color   : new mofron.Color(200,60,60),
+                            visible : false
                         })
                     );
                 }
@@ -299,12 +300,12 @@ mofron.comp.Form = class extends mofron.Component {
         }
     }
     
-    addChild (chd, disp, idx) {
+    addChild (chd, idx) {
         try {
             if (true === mofron.func.isObject(this, 'Form')) {
                 this.initFormComp();
             }
-            super.addChild(chd, disp, (undefined === idx) ? this.child().length-1 : idx);
+            super.addChild(chd, (undefined === idx) ? this.child().length-1 : idx);
         } catch (e) {
             console.error(e.stack);
             throw e;
