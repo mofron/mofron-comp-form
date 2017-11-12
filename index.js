@@ -2,24 +2,34 @@
  * @file mofron-comp-form/index.js
  * @author simpart
  */
-let Button = require('mofron-comp-button');
+let mf = require('mofron');
+let Button  = require('mofron-comp-button');
 let Message = require('mofron-comp-message');
 let Margin  = require('mofron-layout-margin');
 let Center  = require('mofron-layout-hrzcenter');
-
 /**
  * @class Form
  * @brief form component for mofron
  */
-mofron.comp.Form = class extends mofron.Component {
+mf.comp.Form = class extends mf.Component {
     
-    constructor (opt) {
+    constructor (po) {
         try {
             super();
             this.name('Form');
-            this.m_setmsg = false;
-            this.m_setbtn = false;
-            this.prmOpt(opt);
+            this.prmOpt(po);
+        } catch (e) {
+            console.error(e.stack);
+            throw e;
+        }
+    }
+    
+    initDomConts (prm) {
+        try {
+            super.initDomConts();
+            super.addChild(this.message(), false);
+            let sub = this.submitComp();
+            super.addChild(sub.parent().parent());
         } catch (e) {
             console.error(e.stack);
             throw e;
@@ -75,17 +85,6 @@ mofron.comp.Form = class extends mofron.Component {
            xhr.open('POST', send_uri);
            let send_val = this.value();
            
-           /* check hash function */
-           //let hash_fnc = this.hash();
-           //if (null !== hash_fnc) {
-           //    let upd_key,upd_val;
-           //    for (let vidx in send_val) {
-           //        upd_key = hash_fnc(vidx);
-           //        upd_val = hash_fnc(send_val[vidx]);
-           //        send_val[upd_key] = upd_val;
-           //    }
-           //}
-           
            xhr.send(JSON.stringify(send_val));
            return null;
         } catch (e) {
@@ -93,23 +92,6 @@ mofron.comp.Form = class extends mofron.Component {
             throw e;
         }
     }
-    
-    //hash (func) {
-    //    try {
-    //        if (undefined === func) {
-    //            /* getter */
-    //            return (undefined === this.m_hash) ? null : this.m_hash;
-    //        }
-    //        /* setter */
-    //        if ('function' !== typeof tp) {
-    //            throw new Error('invalid parameter');
-    //        }
-    //        this.m_hash = func;
-    //    } catch (e) {
-    //        console.error(e.stack);
-    //        throw e;
-    //    }
-    //}
     
     uri (u) {
         try {
@@ -171,7 +153,7 @@ mofron.comp.Form = class extends mofron.Component {
             let chd     = this.child();
             let val_nm  = null;
             for (var idx in chd) {
-                if (true !== mofron.func.isInclude(chd[idx], 'Form')) {
+                if (true !== mf.func.isInclude(chd[idx], 'Form')) {
                     continue;
                 }
                 val_nm = chd[idx].valueName();
@@ -229,7 +211,7 @@ mofron.comp.Form = class extends mofron.Component {
                     this.message(
                         new Message({
                             text    : '',
-                            color   : new mofron.Color(200,60,60),
+                            color   : new mf.Color(200,60,60),
                             visible : false
                         })
                     );
@@ -237,7 +219,7 @@ mofron.comp.Form = class extends mofron.Component {
                 return this.m_message;
             }
             /* setter */
-            if (true === mofron.func.isInclude(msg, 'Message')) {
+            if (true === mf.func.isInclude(msg, 'Message')) {
                 this.m_message = msg;
             } else if ('string' === typeof msg) {
                 this.message().text(msg);
@@ -263,9 +245,9 @@ mofron.comp.Form = class extends mofron.Component {
                 return this.m_submit;
             }
             /* setter */
-            if (true === mofron.func.isInclude(sub, 'Button')) {
-                new mofron.Component({
-                    addChild : new mofron.Component({
+            if (true === mf.func.isInclude(sub, 'Button')) {
+                new mf.Component({
+                    addChild : new mf.Component({
                         addChild : sub,
                         style    : {
                             width  : (null === sub.width()) ? '100px' : sub.width() + 'px',
@@ -300,37 +282,12 @@ mofron.comp.Form = class extends mofron.Component {
         }
     }
     
-    addChild (chd, idx) {
+    addChild (chd, idx, flg) {
         try {
-            if (true === mofron.func.isObject(this, 'Form')) {
-                this.initFormComp();
-            }
-            super.addChild(chd, (undefined === idx) ? this.child().length-1 : idx);
-        } catch (e) {
-            console.error(e.stack);
-            throw e;
-        }
-    }
-    
-    initFormComp () {
-        try {
-            if (0 === this.layout().length) {
-                /* set default layout */
-                this.layout([
-                    new Margin('top', 25),
-                    new Center({ rate : 70 })
-                ]);
-            }
-            
-            if (false === this.m_setmsg) {
-                this.m_setmsg = true;
-                super.addChild(this.message(), false);
-            }
-            
-            if (false === this.m_setbtn) {
-                this.m_setbtn = true;
-                let sub       = this.submitComp();
-                super.addChild(sub.parent().parent());
+            if (false !== flg) {
+                super.addChild(chd, (undefined === idx) ? this.child().length-2 : idx);
+            } else {
+                super.addChild(chd, idx);
             }
         } catch (e) {
             console.error(e.stack);
