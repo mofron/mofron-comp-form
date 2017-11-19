@@ -3,21 +3,22 @@
  * @author simpart
  */
 let mf = require('mofron');
-let Button  = require('mofron-comp-button');
+let Button = require('mofron-comp-button');
 let Message = require('mofron-comp-message');
 let Margin  = require('mofron-layout-margin');
 let Center  = require('mofron-layout-hrzcenter');
+
 /**
  * @class Form
  * @brief form component for mofron
  */
 mf.comp.Form = class extends mf.Component {
     
-    constructor (po) {
+    constructor (opt) {
         try {
             super();
             this.name('Form');
-            this.prmOpt(po);
+            this.prmOpt(opt);
         } catch (e) {
             console.error(e.stack);
             throw e;
@@ -27,6 +28,11 @@ mf.comp.Form = class extends mf.Component {
     initDomConts (prm) {
         try {
             super.initDomConts();
+            this.layout([
+                new Margin('top', 25),
+                new Center({ rate : 70 })
+            ]);
+            
             super.addChild(this.message(), false);
             let sub = this.submitComp();
             super.addChild(sub.parent().parent());
@@ -117,7 +123,7 @@ mf.comp.Form = class extends mf.Component {
             var ret_chk  = null;
             var form_idx = 0;
             for (var idx in chd) {
-                if (true !== mofron.func.isInclude(chd[idx], 'Form')) {
+                if (true !== mf.func.isInclude(chd[idx], 'Form')) {
                     continue;
                 }
                 
@@ -285,7 +291,7 @@ mf.comp.Form = class extends mf.Component {
     addChild (chd, idx, flg) {
         try {
             if (false !== flg) {
-                super.addChild(chd, (undefined === idx) ? this.child().length-2 : idx);
+                super.addChild(chd, (undefined === idx) ? this.child().length-1 : idx);
             } else {
                 super.addChild(chd, idx);
             }
