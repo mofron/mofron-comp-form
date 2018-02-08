@@ -14,20 +14,11 @@ let Center  = require('mofron-layout-hrzcenter');
  */
 mf.comp.Form = class extends mf.Component {
     
-    constructor (opt) {
-        try {
-            super();
-            this.name('Form');
-            this.prmOpt(opt);
-        } catch (e) {
-            console.error(e.stack);
-            throw e;
-        }
-    }
-    
     initDomConts (prm) {
         try {
+            this.name('Form');
             super.initDomConts();
+            
             this.layout([
                 new Margin('top', 25),
                 new Center({ rate : 70 })
@@ -301,5 +292,5 @@ mf.comp.Form = class extends mf.Component {
         }
     }
 }
-mofron.comp.form = {};
 module.exports   = mofron.comp.Form;
+/* end of file */
