@@ -13,10 +13,19 @@ let Center  = require('mofron-layout-hrzcenter');
  * @brief form component for mofron
  */
 mf.comp.Form = class extends mf.Component {
+    constructor (po) {
+        try {
+            super();
+            this.name('Form');
+            this.prmOpt(po);
+        } catch (e) {
+            console.error(e.stack);
+            throw e;
+        }
+    }
     
     initDomConts (prm) {
         try {
-            this.name('Form');
             super.initDomConts();
             
             this.layout([
@@ -243,6 +252,12 @@ mf.comp.Form = class extends mf.Component {
             }
             /* setter */
             if (true === mf.func.isInclude(sub, 'Button')) {
+                if (undefined !== this.m_submit) {
+                    sub.color(this.m_submit.color());
+                    sub.size(this.m_submit.size()[0], this.m_submit.size()[1]);
+                    this.m_submit.parent().updChild(this.m_submit, sub);
+                    return;
+                }
                 new mf.Component({
                     addChild : new mf.Component({
                         addChild : sub,
