@@ -162,7 +162,7 @@ mf.comp.Form = class extends mf.Component {
                 if (true !== mf.func.isInclude(chd[idx], 'Form')) {
                     continue;
                 }
-                val_nm = chd[idx].valueName();
+                val_nm = chd[idx].setKey();
                 if (null === val_nm) {
                     val_nm = 'prm_' + idx;
                 }
@@ -175,17 +175,17 @@ mf.comp.Form = class extends mf.Component {
         }
     }
     
-    valueName (nm) {
+    setKey (nm) {
         try {
             if (undefined === nm) {
                 /* getter */
-                return (undefined === this.m_valname) ? null : this.m_valname;
+                return (undefined === this.m_form_key) ? null : this.m_form_key;
             }
             /* setter */
             if ('string' !== typeof nm) {
                 throw new Error('invalid parameter');
             }
-            this.m_valname = nm;
+            this.m_form_key = nm;
         } catch (e) {
             console.error(e.stack);
             throw e;
