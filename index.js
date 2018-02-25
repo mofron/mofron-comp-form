@@ -24,13 +24,13 @@ mf.comp.Form = class extends mf.Component {
         }
     }
     
-    initDomConts (prm) {
+    initDomConts (mgn, cnt) {
         try {
             super.initDomConts();
             
             this.layout([
-                new Margin('top', 25),
-                new Center({ rate : 70 })
+                new Margin('top', (undefined === mgn) ? 25 : mgn),
+                new Center({ rate : (undefined === cnt) ? 70 : cnt })
             ]);
             
             super.addChild(this.message(), false);
