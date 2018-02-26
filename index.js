@@ -87,7 +87,28 @@ mf.comp.Form = class extends mf.Component {
         }
     }
     
-    send (url) {
+    sendEvent (func, prm) {
+        try {
+            if (undefined === func) {
+                /* getter */
+                return (undefined === this.m_sendevt) ? new Array(null,null) : this.m_sendevt;
+            }
+            /* setter */
+            if ('function' !== typeof func) {
+                throw new Error('invalid parameter');
+            }
+            if (undefined === this.m_sendevt) {
+                this.m_sendevt = new Array(null,null);
+            }
+            this.m_sendevt[0] = func;
+            this.m_sendevt[1] = (undefined === prm) ? null : prm;
+        } catch (e) {
+            console.error(e.stack);
+            throw e;
+        }
+    }
+    
+    send () {
         try {
            if (0 === this.child().length) {
                return {
@@ -115,6 +136,9 @@ mf.comp.Form = class extends mf.Component {
            xhr.open('POST', send_uri);
            let send_val = this.value();
            
+           if (null !== this.sendEvent()[0]) {
+               this.sendEvent()[0](this, this.sendEvent()[1]);
+           }
            xhr.send(JSON.stringify(send_val));
            return null;
         } catch (e) {
@@ -270,7 +294,12 @@ mf.comp.Form = class extends mf.Component {
             if (undefined === sub) {
                 /* getter */
                 if (undefined === this.m_submit) {
-                    this.submitComp(new Button('Send'));
+                    this.submitComp(
+                        new Button({
+                            text  : 'Send',
+                            width : 100
+                        })
+                    );
                 }
                 return this.m_submit;
             }
@@ -282,12 +311,14 @@ mf.comp.Form = class extends mf.Component {
                     this.m_submit.parent().updChild(this.m_submit, sub);
                     return;
                 }
+                let sub_wid = ('number' === typeof sub.width()) ? sub.width()+'px' : sub.width();
                 new mf.Component({
                     addChild : new mf.Component({
                         addChild : sub,
                         style    : {
-                            width  : (null === sub.width()) ? '100px' : sub.width() + 'px',
-                                         'margin-left' : 'auto'
+                            'position'    : 'relative',
+                            'margin-left' : '100%'    ,
+                            'left'        : '-' + sub_wid
                         }
                     })
                 });
