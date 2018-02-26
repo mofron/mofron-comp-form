@@ -42,6 +42,30 @@ mf.comp.Form = class extends mf.Component {
         }
     }
     
+    marginCenter (mgn, cnt) {
+        try {
+            let margin = this.getConfig('layout', 'Margin');
+            let center = this.getConfig('layout', 'HrzCenter');
+            if (undefined === mgn) {
+                /* getter */
+                return [
+                    (null === margin) ? margin : margin.value(),
+                    (null === center) ? center : center.rate()
+                ];
+            }
+            /* setter */
+            if (null !== margin) {
+                margin.value(mgn);
+            }
+            if (null !== center) {
+                center.rate(cnt);
+            }
+        } catch (e) {
+            console.error(e.stack);
+            throw e;
+        }
+    }
+    
     callback (func, prm) {
         try {
             if (undefined === func) {
