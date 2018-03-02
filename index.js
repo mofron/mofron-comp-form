@@ -304,10 +304,22 @@ mf.comp.Form = class extends mf.Component {
                 return this.m_submit;
             }
             /* setter */
+            let clk_fnc = (tgt, frm) => {
+                try {
+                    let ret = frm.send();
+                    if (null !== ret) {
+                        frm.message(ret['cause']);
+                    }
+                } catch (e) {
+                    console.error(e.stack);
+                    throw e;
+                }
+            };
             if (true === mf.func.isInclude(sub, 'Button')) {
                 if (undefined !== this.m_submit) {
                     sub.color(this.m_submit.color());
                     sub.size(this.m_submit.size()[0], this.m_submit.size()[1]);
+                    sub.clickEvent(clk_fnc, this);
                     this.m_submit.parent().updChild(this.m_submit, sub);
                     return;
                 }
@@ -323,20 +335,7 @@ mf.comp.Form = class extends mf.Component {
                     })
                 });
                 sub.width((null === sub.width()) ? 100 : undefined);
-                sub.clickEvent(
-                    (tgt, frm) => {
-                        try {
-                            var ret = frm.send();
-                            if (null !== ret) {
-                                frm.message(ret['cause']);
-                            }
-                        } catch (e) {
-                            console.error(e.stack);
-                            throw e;
-                        }
-                    },
-                    this
-                );
+                sub.clickEvent(clk_fnc, this);
                 this.m_submit = sub;
             } else if ('string' === typeof sub) {
                 this.submitComp().text(sub);
