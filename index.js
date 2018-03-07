@@ -360,6 +360,69 @@ mf.comp.Form = class extends mf.Component {
             throw e;
         }
     }
+    
+    width (prm) {
+        try {
+            let hcnt = this.getConfig('layout', 'HrzCenter');
+            if (undefined === prm) {
+                /* getter */
+                if (null === hcnt) {
+                    return null;
+                }
+                return hcnt.rate() + '%';
+            }
+            /* setter */
+            if (null === hcnt) {
+                let chd = this.child();
+                for (let cidx in chd) {
+                    if (true === mf.func.isInclude(chd[cidx], 'Form')) {
+                        chd[cidx].width(prm);
+                    }
+                }
+            } else {
+                hcnt.rate(prm);
+            }
+        } catch (e) {
+            console.error(e.stack);
+            throw e;
+        }
+    }
+    
+    height (prm) {
+        try {
+            let mrg = this.getConfig('layout', 'Margin');
+            let chd = this.child();
+            if (undefined === prm) {
+                /* getter */
+                let hret = 0;
+                let mval = (null === mrg) ? 0 : mrg.value();
+                for (let cidx in chd) {
+                    if ( (true === mf.func.isInclude(chd[cidx], 'Message')) &&
+                         (false === chd[cidx].visible())) {
+                        continue;
+                    }
+                    hret += ('number' === typeof (chd[cidx].height())) ? chd[cidx].height() : 0;
+                    hret += mval;
+                }
+                return hret;
+            }
+            /* setter */
+            if (null === mrg) {
+                if ('number' !== typeof prm) {
+                    throw new Error('invalid paramter');
+                }
+                let chei = prm / (0 === chd.length) ? 1 : chd.length;
+                for (let cidx in chd) {
+                    chd[cidx].height(chei);
+                }
+            } else {
+                mrg.value(prm);
+            }
+        } catch (e) {
+            console.error(e.stack);
+            throw e;
+        }
+    }
 }
 module.exports   = mofron.comp.Form;
 /* end of file */
