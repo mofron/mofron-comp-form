@@ -401,7 +401,11 @@ mf.comp.Form = class extends mf.Component {
                          (false === chd[cidx].visible())) {
                         continue;
                     }
-                    hret += ('number' === typeof (chd[cidx].height())) ? chd[cidx].height() : 0;
+                    if (parseInt(cidx)+1 == chd.length) {
+                        hret += this.submitComp().height();
+                    } else {
+                        hret += ('number' === typeof (chd[cidx].height())) ? chd[cidx].height() : 0;
+                    }
                     hret += mval;
                 }
                 return hret;
