@@ -298,7 +298,7 @@ mf.comp.Form = class extends mf.Component {
                     this.submitComp(
                         new Button({
                             text  : 'Send',
-                            width : 100
+                            size  : new mf.Param(100, 30)
                         })
                     );
                 }
