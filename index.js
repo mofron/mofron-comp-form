@@ -27,6 +27,7 @@ mf.comp.Form = class extends mf.Component {
     initDomConts (mgn, cnt) {
         try {
             super.initDomConts();
+            this.target().style({ 'width' : '100%' });
             
             this.layout([
                 new Margin('top', (undefined === mgn) ? 25 : mgn),
