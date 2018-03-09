@@ -278,15 +278,40 @@ mf.comp.Form = class extends mf.Component {
                 this.m_message = msg;
             } else if ('string' === typeof msg) {
                 this.message().text(msg);
-                this.message().visible(('' === msg) ? false : true);
+                this.message().visible(true);
+                let mevt = this.msgEvent();
+                if (null !== mevt[0]) {
+                    mevt[0](msg, mevt[1]);
+                }
             } else if (null === msg) {
                 this.message().visible(false);
+                let mevt = this.msgEvent();
+                if (null !== mevt[0]) {
+                    mevt[0](msg, mevt[1]);
+                }               
             } else {
                 throw new Error('invalid parameter');
             }
         } catch (e) {
             console.error(e.stack);
             throw e;
+        }
+    }
+    
+    msgEvent (fnc, prm) {
+        try {
+            if (undefined === fnc) {
+                /* getter */
+                return (undefined === this.m_msg_evt) ? [null, null] : this.m_msg_evt;
+            }
+            /* setter */
+            if ('function' !== typeof fnc) {
+                throw new Error('invalid paramter');
+            }
+            this.m_msg_evt = new Array(fnc, prm);
+        } catch (e) {
+            console.error(e.stack);
+            throw e;          
         }
     }
     
