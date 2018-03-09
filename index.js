@@ -37,8 +37,53 @@ mf.comp.Form = class extends mf.Component {
             super.addChild(this.message(), false);
             let sub = this.submitComp();
             super.addChild(sub.parent().parent());
+            
+            this.initKeyEvent();
         } catch (e) {
             console.error(e.stack);
+            throw e;
+        }
+    }
+    
+    initKeyEvent () {
+        try {
+            if (undefined !== window.onkeyup) {
+                let form = this;
+                window.onkeyup = (e) => {
+                    try {
+                        let key      = e.keyCode ? e.keyCode : e.which;
+                        let chd      = form.child();
+                        let send_ret = null;
+                        for (let cidx in chd) {
+                            if (true !== mf.func.isInclude(chd[cidx], 'Form')) {
+                                continue;
+                            }
+                            if ( (13 === key) &&
+                                 (true === chd[cidx].isFocused())) {
+                                send_ret = form.send();
+                                if (null !== send_ret) {
+                                    form.message(send_ret['cause']);
+                                }
+                                break;
+                            }
+                        }
+                    } catch (e) {
+                        console.error(e.stack);
+                        throw e;
+                    }
+                }
+            }
+        } catch (e) {
+            console.log(e.stack);
+            throw e;
+        }
+    }
+    
+    isFocused () {
+        try {
+            console.warn('not implements');
+        } catch (e) {
+            console.log(e.stack);
             throw e;
         }
     }
