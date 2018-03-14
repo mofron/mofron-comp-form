@@ -79,15 +79,6 @@ mf.comp.Form = class extends mf.Component {
         }
     }
     
-    isFocused () {
-        try {
-            console.warn('not implements');
-        } catch (e) {
-            console.log(e.stack);
-            throw e;
-        }
-    }
-    
     marginCenter (mgn, cnt) {
         try {
             let margin = this.getConfig('layout', 'Margin');
@@ -183,7 +174,13 @@ mf.comp.Form = class extends mf.Component {
            let send_val = this.value();
            
            if (null !== this.sendEvent()[0]) {
-               this.sendEvent()[0](this, this.sendEvent()[1]);
+               let ev_ret = this.sendEvent()[0](this, this.sendEvent()[1]);
+               if (null !== ev_ret) {
+                   return {
+                       index : -1,
+                       cause : ev_ret
+                   };
+               }
            }
            xhr.send(JSON.stringify(send_val));
            return null;
@@ -217,7 +214,7 @@ mf.comp.Form = class extends mf.Component {
             var ret_chk  = null;
             var form_idx = 0;
             for (var idx in chd) {
-                if (true !== mf.func.isInclude(chd[idx], 'Form')) {
+                if (true !== mf.func.isInclude(chd[idx], 'FormItem')) {
                     continue;
                 }
                 
@@ -253,50 +250,16 @@ mf.comp.Form = class extends mf.Component {
             let chd     = this.child();
             let val_nm  = null;
             for (var idx in chd) {
-                if (true !== mf.func.isInclude(chd[idx], 'Form')) {
+                if (true !== mf.func.isInclude(chd[idx], 'FormItem')) {
                     continue;
                 }
-                val_nm = chd[idx].setKey();
+                val_nm = chd[idx].sendKey();
                 if (null === val_nm) {
                     val_nm = 'prm_' + idx;
                 }
                 ret_val[val_nm] = chd[idx].value();
             }
             return ret_val;
-        } catch (e) {
-            console.error(e.stack);
-            throw e;
-        }
-    }
-    
-    setKey (nm) {
-        try {
-            if (undefined === nm) {
-                /* getter */
-                return (undefined === this.m_form_key) ? null : this.m_form_key;
-            }
-            /* setter */
-            if ('string' !== typeof nm) {
-                throw new Error('invalid parameter');
-            }
-            this.m_form_key = nm;
-        } catch (e) {
-            console.error(e.stack);
-            throw e;
-        }
-    }
-    
-    require (flg) {
-        try {
-            if (undefined === flg) {
-                /* getter */
-                return (undefined === this.m_req) ? false : this.m_req;
-            }
-            /* setter */
-            if ('boolean' !== typeof flg) {
-                throw new Error('invalid parameter');
-            }
-            this.m_req = flg;
         } catch (e) {
             console.error(e.stack);
             throw e;
@@ -499,5 +462,5 @@ mf.comp.Form = class extends mf.Component {
         }
     }
 }
-module.exports   = mofron.comp.Form;
+module.exports = mofron.comp.Form;
 /* end of file */
