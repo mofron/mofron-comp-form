@@ -147,19 +147,13 @@ mf.comp.Form = class extends mf.Component {
     
     send () {
         try {
-           if (0 === this.child().length) {
-               return {
-                   index : -1,
-                   cause : 'form is no element'
-               };
-           }
-           var ret_chk = this.checkValue();
+           let ret_chk = this.checkValue();
            if (null !== ret_chk) {
                return ret_chk;
            }
            
-           var cb   = this.callback();
-           var xhr  = new XMLHttpRequest();
+           let cb   = this.callback();
+           let xhr  = new XMLHttpRequest();
            let form = this;
            xhr.addEventListener('load', function(event) {
                if (null != cb[0]) {
@@ -209,34 +203,35 @@ mf.comp.Form = class extends mf.Component {
     
     checkValue () {
         try {
-            this.message(null);
-            var chd      = this.child();
-            var ret_chk  = null;
-            var form_idx = 0;
-            for (var idx in chd) {
-                if (true !== mf.func.isInclude(chd[idx], 'FormItem')) {
-                    continue;
-                }
-                
+            let items    = this.getItems();
+            let ret_chk  = null;
+            let form_idx = 0;
+            if (null === items) {
+               return {
+                   index : -1,
+                   cause : 'form is no element'
+               };
+            }
+            for (let idx in items) {
                 /* null check */
-                if ( (true === chd[idx].require()) &&
-                     ( (null      === chd[idx].value()) ||
-                       (undefined === chd[idx].value()) ) ) {
+                if ( (true === items[idx].require()) &&
+                     ( (null      === items[idx].value()) ||
+                       (undefined === items[idx].value()) ) ) {
                     return {
-                        index : form_idx,
+                        index : idx,
                         cause : 'emply value'
-                    }
+                    };
                 }
-                ret_chk = chd[idx].checkValue();
+                ret_chk = items[idx].checkValue();
                 if (null !== ret_chk) {
                     return {
-                        index : form_idx,
+                        index : idx,
                         cause : ret_chk
                     }
                 }
-                
-                form_idx++;
             }
+            /* reset message */
+            this.message(null);
             return null;
         } catch (e) {
             console.error(e.stack);
@@ -247,17 +242,15 @@ mf.comp.Form = class extends mf.Component {
     value () {
         try {
             let ret_val = {};
-            let chd     = this.child();
+            let items   = this.getItems();
             let val_nm  = null;
-            for (var idx in chd) {
-                if (true !== mf.func.isInclude(chd[idx], 'FormItem')) {
-                    continue;
-                }
-                val_nm = chd[idx].sendKey();
-                if (null === val_nm) {
-                    val_nm = 'prm_' + idx;
-                }
-                ret_val[val_nm] = chd[idx].value();
+            if (null === items) {
+                return null;
+            }
+            /* get item value */
+            for (var idx in items) {
+                val_nm = items[idx].sendKey();
+                ret_val[(null === val_nm)? 'prm_' + idx : val_nm] = items[idx].value();
             }
             return ret_val;
         } catch (e) {
@@ -456,6 +449,22 @@ mf.comp.Form = class extends mf.Component {
             } else {
                 mrg.value(prm);
             }
+        } catch (e) {
+            console.error(e.stack);
+            throw e;
+        }
+    }
+    
+    getItems () {
+        try {
+            let ret = new Array();
+            let chd = this.child();
+            for (let cidx in chd) {
+                if (true === mf.func.isInclude(chd[cidx], 'FormItem') {
+                    ret.push(chd[cidx]);
+                }
+            }
+            return (0 === ret.length) ? null : ret;
         } catch (e) {
             console.error(e.stack);
             throw e;
