@@ -460,7 +460,7 @@ mf.comp.Form = class extends mf.Component {
             let ret = new Array();
             let chd = this.child();
             for (let cidx in chd) {
-                if (true === mf.func.isInclude(chd[cidx], 'FormItem') {
+                if (true === mf.func.isInclude(chd[cidx], 'FormItem')) {
                     ret.push(chd[cidx]);
                 }
             }
