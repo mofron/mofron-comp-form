@@ -214,14 +214,6 @@ mf.comp.Form = class extends mf.Component {
             }
             for (let idx in items) {
                 /* null check */
-                if ( (true === items[idx].require()) &&
-                     ( (null      === items[idx].value()) ||
-                       (undefined === items[idx].value()) ) ) {
-                    return {
-                        index : idx,
-                        cause : 'emply value'
-                    };
-                }
                 ret_chk = items[idx].checkValue();
                 if (null !== ret_chk) {
                     return {
@@ -272,6 +264,7 @@ mf.comp.Form = class extends mf.Component {
                         })
                     );
                 }
+console.log(this.m_message.visible());
                 return this.m_message;
             }
             /* setter */
