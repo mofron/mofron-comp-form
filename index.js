@@ -74,7 +74,7 @@ mf.comp.Form = class extends mf.Component {
                 }
             }
         } catch (e) {
-            console.log(e.stack);
+            console.error(e.stack);
             throw e;
         }
     }
@@ -264,7 +264,6 @@ mf.comp.Form = class extends mf.Component {
                         })
                     );
                 }
-console.log(this.m_message.visible());
                 return this.m_message;
             }
             /* setter */
