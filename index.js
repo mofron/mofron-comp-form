@@ -103,21 +103,20 @@ mf.comp.Form = class extends mf.Component {
         }
     }
     
-    callback (func, prm) {
+    callback (fnc, prm) {
         try {
-            if (undefined === func) {
+            if (undefined === fnc) {
                 /* getter */
-                return (undefined === this.m_callback) ? new Array(null,null) : this.m_callback;
+                return (undefined === this.m_callback) ? null : this.m_callback;
             }
             /* setter */
-            if ('function' !== typeof func) {
+            if ('function' !== typeof fnc) {
                 throw new Error('invalid parameter');
             }
             if (undefined === this.m_callback) {
-                this.m_callback = new Array(null,null);
+                this.m_callback = new Array();
             }
-            this.m_callback[0] = func;
-            this.m_callback[1] = (undefined === prm) ? null : prm;
+            this.m_callback.push(new Array(fnc, (undefined === prm) ? null : prm));
         } catch (e) {
             console.error(e.stack);
             throw e;
@@ -128,17 +127,16 @@ mf.comp.Form = class extends mf.Component {
         try {
             if (undefined === func) {
                 /* getter */
-                return (undefined === this.m_sendevt) ? new Array(null,null) : this.m_sendevt;
+                return (undefined === this.m_sendevt) ? null : this.m_sendevt;
             }
             /* setter */
             if ('function' !== typeof func) {
                 throw new Error('invalid parameter');
             }
             if (undefined === this.m_sendevt) {
-                this.m_sendevt = new Array(null,null);
+                this.m_sendevt = new Array();
             }
-            this.m_sendevt[0] = func;
-            this.m_sendevt[1] = (undefined === prm) ? null : prm;
+            this.m_sendevt.push(new Array(func, (undefined === prm) ? null : prm));
         } catch (e) {
             console.error(e.stack);
             throw e;
@@ -156,8 +154,14 @@ mf.comp.Form = class extends mf.Component {
            let xhr  = new XMLHttpRequest();
            let form = this;
            xhr.addEventListener('load', function(event) {
-               if (null != cb[0]) {
-                   cb[0](JSON.parse(this.response), form, cb[1]);
+               if (null != cb) {
+                   let cb_ret = null;
+                   for (let cidx in cb) {
+                       cb_ret = cb[cidx][0](JSON.parse(this.response), form, cb[cidx][1]);
+                       if (null !== cb_ret) {
+                           form.message(cb_ret);
+                       }
+                   }
                }
            });
            var send_uri = (undefined === this.uri()) ? this.m_param : this.uri();
@@ -167,15 +171,20 @@ mf.comp.Form = class extends mf.Component {
            xhr.open('POST', send_uri);
            let send_val = this.value();
            
-           if (null !== this.sendEvent()[0]) {
-               let ev_ret = this.sendEvent()[0](this, this.sendEvent()[1]);
-               if (null !== ev_ret) {
-                   return {
-                       index : -1,
-                       cause : ev_ret
-                   };
+           let snd_evt = this.sendEvent();
+           if (null !== snd_evt) {
+               let ev_ret = null;
+               for (let eidx in snd_evt) {
+                   ev_ret = snd_evt[eidx][0](this, snd_evt[eidx][1]);
+                   if (null !== ev_ret) {
+                       return {
+                           index : -1,
+                           cause : ev_ret
+                       };
+                   }
                }
            }
+           
            xhr.send(JSON.stringify(send_val));
            return null;
         } catch (e) {
