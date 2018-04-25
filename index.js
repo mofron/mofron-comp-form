@@ -166,7 +166,7 @@ mf.comp.Form = class extends mf.Component {
            });
            var send_uri = (undefined === this.uri()) ? this.m_param : this.uri();
            if (null === send_uri) {
-               throw new Error('invalid parameter');
+               throw new Error('could not find uri');
            }
            xhr.open('POST', send_uri);
            let send_val = this.value();
