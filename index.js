@@ -456,6 +456,18 @@ mf.comp.Form = class extends mf.Component {
         }
     }
     
+    clear () {
+        try {
+            let item = this.getItems();
+            for (let iidx in item) {
+                item[iidx].clear();
+            }
+        } catch (e) {
+            console.error(e.stack);
+            throw e;
+        }
+    }
+    
     getItems () {
         try {
             let ret = new Array();
