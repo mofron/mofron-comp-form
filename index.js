@@ -462,6 +462,7 @@ mf.comp.Form = class extends mf.Component {
             for (let iidx in item) {
                 item[iidx].clear();
             }
+            this.message(null);
         } catch (e) {
             console.error(e.stack);
             throw e;
