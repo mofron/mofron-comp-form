@@ -376,6 +376,15 @@ mf.comp.Form = class extends mf.Component {
         }
     }
     
+    submitText (prm) {
+        if (undefined === prm) {
+            /* getter */
+            return this.submitComp().text();
+        }
+        /* setter */
+        this.submitComp().text(prm);
+    }
+    
     addChild (chd, idx, flg) {
         try {
             if (false !== flg) {
