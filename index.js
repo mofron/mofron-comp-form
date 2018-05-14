@@ -170,6 +170,12 @@ mf.comp.Form = class extends mf.Component {
            }
            xhr.open('POST', send_uri);
            let send_val = this.value();
+           let optprm = this.optionParam();
+           if (null !== optprm) {
+               for (let oidx in optprm) {
+                   send_val[oidx] = optprm[oidx];
+               }
+           }
            
            let snd_evt = this.sendEvent();
            if (null !== snd_evt) {
@@ -492,6 +498,17 @@ mf.comp.Form = class extends mf.Component {
             console.error(e.stack);
             throw e;
         }
+    }
+    
+    optionParam (prm) {
+        if (undefined === prm) {
+            /* getter */
+            return (undefined === this.m_optprm) ? null : this.m_optprm;
+        }
+        if ('object' !== typeof prm) {
+            throw new Error('invalid parameter');
+        }
+        this.m_optprm = prm;
     }
 }
 module.exports = mofron.comp.Form;
