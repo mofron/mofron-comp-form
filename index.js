@@ -31,7 +31,7 @@ mf.comp.Form = class extends mf.Component {
             
             this.layout([
                 new Margin('top', (undefined === mgn) ? 25 : mgn),
-                new Center({ rate : (undefined === cnt) ? 70 : cnt })
+                new Center((undefined === cnt) ? 70 : cnt)
             ]);
             
             super.addChild(this.message(), false);
