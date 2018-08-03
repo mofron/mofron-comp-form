@@ -13,11 +13,12 @@ let Center  = require('mofron-layout-hrzcenter');
  * @brief form component for mofron
  */
 mf.comp.Form = class extends mf.Component {
-    constructor (po) {
+    constructor (po, p2) {
         try {
             super();
             this.name('Form');
-            this.prmOpt(po);
+            this.prmMap('uri', 'child');
+            this.prmOpt(po, p2);
         } catch (e) {
             console.error(e.stack);
             throw e;
@@ -113,10 +114,7 @@ mf.comp.Form = class extends mf.Component {
             if ('function' !== typeof fnc) {
                 throw new Error('invalid parameter');
             }
-            if (undefined === this.m_callback) {
-                this.m_callback = new Array();
-            }
-            this.m_callback.push(new Array(fnc, (undefined === prm) ? null : prm));
+            this.m_callback = [fnc, prm];
         } catch (e) {
             console.error(e.stack);
             throw e;
