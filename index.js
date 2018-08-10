@@ -17,6 +17,7 @@ mf.comp.Form = class extends mf.Component {
         try {
             super();
             this.name('Form');
+            this.sizeType('rem');
             this.prmMap('uri', 'child');
             this.prmOpt(po, p2);
         } catch (e) {
@@ -283,14 +284,18 @@ mf.comp.Form = class extends mf.Component {
             if (true === mf.func.isInclude(msg, 'Message')) {
                 this.m_message = msg;
             } else if ('string' === typeof msg) {
-                this.message().text(msg);
-                this.message().visible(true);
+                this.message().execOption({
+                    text    : msg,
+                    visible : true
+                });
                 let mevt = this.msgEvent();
                 if (null !== mevt[0]) {
                     mevt[0](msg, mevt[1]);
                 }
             } else if (null === msg) {
-                this.message().visible(false);
+                this.message().execOption({ 
+                    visible : true
+                });
                 let mevt = this.msgEvent();
                 if (null !== mevt[0]) {
                     mevt[0](msg, mevt[1]);
@@ -329,7 +334,7 @@ mf.comp.Form = class extends mf.Component {
                     this.submitComp(
                         new Button({
                             text  : 'Send',
-                            size  : new mf.Param(100, 30)
+                            size  : new mf.Param(1, 0.3)
                         })
                     );
                 }
@@ -355,22 +360,23 @@ mf.comp.Form = class extends mf.Component {
                     this.m_submit.parent().updChild(this.m_submit, sub);
                     return;
                 }
-                let sub_wid = ('number' === typeof sub.width()) ? sub.width()+'px' : sub.width();
                 new mf.Component({
                     addChild : new mf.Component({
                         addChild : sub,
                         style    : {
                             'position'    : 'relative',
                             'margin-left' : '100%'    ,
-                            'left'        : '-' + sub_wid
+                            'left'        : '-' + sub.width()
                         }
                     })
                 });
-                sub.width((null === sub.width()) ? 100 : undefined);
+                sub.width((null === sub.width()) ? 1 : undefined);
                 sub.clickEvent(clk_fnc, this);
                 this.m_submit = sub;
             } else if ('string' === typeof sub) {
-                this.submitComp().text(sub);
+                this.submitComp().execOption({
+                    text : sub
+                });
             } else {
                 throw new Error('invalid parameter');
             }
@@ -386,7 +392,9 @@ mf.comp.Form = class extends mf.Component {
             return this.submitComp().text();
         }
         /* setter */
-        this.submitComp().text(prm);
+        this.submitComp().execOption({
+            text : prm
+        });
     }
     
     addChild (chd, idx, flg) {
@@ -443,12 +451,17 @@ mf.comp.Form = class extends mf.Component {
                         continue;
                     }
                     if (parseInt(cidx)+1 == chd.length) {
-                        hret += this.submitComp().height();
+                        hret = mf.func.sizeSum(hret, this.submitComp().height());
                     } else {
-                        hret += ('number' === typeof (chd[cidx].height())) ? chd[cidx].height() : 0;
+                        hret = mf.func.sizeSum(
+                            hret,
+                            chd[cidx].height(),
+                            (true === mf.func.isInclude(chd[cidx], 'Input')) ? 0.15 : 0
+                        );
                     }
-                    hret += mval;
+                    hret = mf.func.sizeSum(hret, mval);
                 }
+                hret = mf.func.sizeSum(hret, mval);
                 return hret;
             }
             /* setter */
