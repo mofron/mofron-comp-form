@@ -1,7 +1,7 @@
 {
   "name": "mofron-comp-form",
-  "version": "0.8.2",
-  "description": "Form Component for mofron",
+  "version": "0.9.0",
+  "description": "form Component for mofron",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -11,14 +11,14 @@
     "url": "git+https://github.com/mofron/mofron-comp-form.git"
   },
   "dependencies": {
-    "mofron-layout-margin" : "",
-    "mofron-layout-hrzcenter" : ""
+    "mofron-effect-hrzpos" : "",
+    "mofron-effect-syncwid" : ""
   },
   "keywords": [
     "front-end"
   ],
   "author": "simparts",
-  "license": "SEE LICENSE IN LICENSE",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/mofron/mofron-comp-form/issues"
   },

@@ -4,19 +4,23 @@
  */
 const mf      = require('mofron');
 const Button  = require('mofron-comp-button');
-const Message = require('mofron-comp-message');
-const HrzPos  = require('mofron-effect-hrzpos');
+const Message = require('mofron-comp-errmsg');
+const Hrzpos  = require('mofron-effect-hrzpos');
+const Synwid  = require('mofron-effect-syncwid');
 
-/**
- * @class Form
- * @brief form component for mofron
- */
 mf.comp.Form = class extends mf.Component {
+    /**
+     * initialize form component
+     *
+     * @param p1 (object) component option
+     * @param p1 (string) path to uri
+     * @param p2 (component) form child component
+     */
     constructor (po, p2) {
         try {
             super();
             this.name('Form');
-            this.prmMap('uri', 'child');
+            this.prmMap(['uri', 'child']);
             this.prmOpt(po, p2);
         } catch (e) {
             console.error(e.stack);
@@ -24,232 +28,218 @@ mf.comp.Form = class extends mf.Component {
         }
     }
     
+    /**
+     * initialize dom contents
+     *
+     * @note private method
+     */
     initDomConts () {
         try {
             super.initDomConts();
-            let conts  = new mf.Component({});
-            let submit = new mf.Component({
-                width : '100%'
+            /* component contents */
+            let conts = new mf.Component(this.message());
+            let btn   = new mf.Component({
+                effect : new Synwid(this),
+                child  : this.submitConts()
             });
-            
-            this.child([ conts, submit ]);
+            this.child([ conts, btn ]);
+            this.submitConts('Submit');
             this.target(conts.target());
-            this.child([this.message()]);
             
-            this.submitTgt(submit.target());
-            this.switchTgt(
-                submit.target(),
-                (p1) => {
-                    try { p1.addChild(p1.submitComp()); } catch (e) {
-                        console.error(e.stack);
-                        throw e;
-                    }
-                }
-            );
-            //this.initKeyEvent();
+            /* add enter key event */
+            this.initKeyEvent();
         } catch (e) {
             console.error(e.stack);
             throw e;
         }
     }
     
+    /**
+     * add enter key event
+     *
+     * @note private method
+     */
     initKeyEvent () {
         try {
-//            if (undefined !== window.onkeyup) {
-//                let form = this;
-//                window.onkeyup = (e) => {
-//                    try {
-//                        let key      = e.keyCode ? e.keyCode : e.which;
-//                        let chd      = form.child();
-//                        let send_ret = null;
-//                        for (let cidx in chd) {
-//                            if (true !== mf.func.isInclude(chd[cidx], 'Form')) {
-//                                continue;
-//                            }
-//                            if ( (13 === key) &&
-//                                 (true === chd[cidx].isFocused())) {
-//                                send_ret = form.send();
-//                                if (null !== send_ret) {
-//                                    form.message(send_ret['cause']);
-//                                }
-//                                break;
-//                            }
-//                        }
-//                    } catch (e) {
-//                        console.error(e.stack);
-//                        throw e;
-//                    }
-//                }
-//            }
-        } catch (e) {
-            console.error(e.stack);
-            throw e;
-        }
-    }
-    
-    marginCenter (mgn, cnt) {
-        try {
-            let margin = this.getConfig('layout', 'Margin');
-            let center = this.getConfig('layout', 'HrzCenter');
-            if (undefined === mgn) {
-                /* getter */
-                return [
-                    (null === margin) ? margin : margin.value(),
-                    (null === center) ? center : center.rate()
-                ];
-            }
-            /* setter */
-            if (null !== margin) {
-                margin.value(mgn);
-            }
-            if (null !== center) {
-                center.rate(cnt);
-            }
-        } catch (e) {
-            console.error(e.stack);
-            throw e;
-        }
-    }
-    
-    callback (fnc, prm) {
-        try {
-            if (undefined === fnc) {
-                /* getter */
-                return (undefined === this.m_callback) ? null : this.m_callback;
-            }
-            /* setter */
-            if ('function' !== typeof fnc) {
-                throw new Error('invalid parameter');
-            }
-            this.m_callback = [fnc, prm];
-        } catch (e) {
-            console.error(e.stack);
-            throw e;
-        }
-    }
-    
-    sendEvent (func, prm) {
-        try {
-            if (undefined === func) {
-                /* getter */
-                return (undefined === this.m_sendevt) ? [] : this.m_sendevt;
-            }
-            /* setter */
-            if ('function' !== typeof func) {
-                throw new Error('invalid parameter');
-            }
-            if (undefined === this.m_sendevt) {
-                this.m_sendevt = new Array();
-            }
-            this.m_sendevt.push(new Array(func, (undefined === prm) ? null : prm));
-        } catch (e) {
-            console.error(e.stack);
-            throw e;
-        }
-    }
-    
-    send () {
-        try {
-            this.checkValue();
-            if (true === this.message().visible()) {
-                return;
-            }
-            if (null === this.uri()) {
-                throw new Error('could not find uri');
-            }
-            
-            let xhr  = new XMLHttpRequest();
-            let form = this;
-            xhr.addEventListener(
-                'load',
-                (event) => {
+            if (undefined !== window.onkeyup) {
+                let form = this;
+                window.onkeyup = (e) => {
                     try {
-                        if (null !== form.callback()) {
-                            form.callback()[0](form, form.callback()[1]);
+                        let key      = e.keyCode ? e.keyCode : e.which;
+                        let chd      = form.getItems();
+                        let send_ret = null;
+                        for (let cidx in chd) {
+                            if ( (13 === key) &&
+                                 (true === chd[cidx].focus()) ) {
+                                form.send();
+                                break;
+                            }
                         }
                     } catch (e) {
                         console.error(e.stack);
                         throw e;
                     }
                 }
-            );
-            
-            xhr.open('POST', this.uri());
-            let snd_evt = this.sendEvent();
-            let ev_ret  = null;
-            for (let eidx in snd_evt) {
-                ev_ret = snd_evt[eidx][0](this, snd_evt[eidx][1]);
-                if (null !== ev_ret) {
-                    this.msgText(ev_ret);
-                    return;
-                }
             }
-            
-            xhr.send(JSON.stringify(this.value()));
         } catch (e) {
             console.error(e.stack);
             throw e;
         }
     }
     
-    uri (u) {
+    /**
+     * setter/getter callback function for send
+     * 
+     * @param p1 (function) send event function
+     * @param p1 (undefined) call as getter
+     * @param p2 (mix) event parameter
+     * @return (array) send event array
+     */
+    callback (fnc, prm) {
         try {
-            if (undefined === u) {
-                /* getter */
-                return (undefined === this.m_uri) ? null : this.m_uri;
-            }
-            /* setter */
-            if ('string' !== typeof u) {
+            if ( (undefined !== fnc) && ('function' !== typeof fnc)) {
                 throw new Error('invalid parameter');
             }
-            this.m_uri = u;
+            return this.arrayMember(
+                'callback', ['function', null],
+                (undefined !== fnc) ? [fnc, prm] : undefined
+            );
         } catch (e) {
             console.error(e.stack);
             throw e;
         }
     }
     
+    /**
+     * send event setter/getter
+     * call function before send
+     * 
+     * @param p1 (function) send event function
+     * @param p1 (undefined) call as getter
+     * @param p2 (mix) event parameter
+     * @return (array) send event array
+     */
+    sendEvent (fnc, prm) {
+        try {
+            if ( (undefined !== fnc) && ('function' !== typeof fnc)) {
+                throw new Error('invalid parameter');
+            }
+            return this.arrayMember(
+                'sendEvent', ['function', null],
+                (undefined !== fnc) ? [fnc, prm] : undefined
+            );
+        } catch (e) {
+            console.error(e.stack);
+            throw e;
+        }
+    }
+    
+    /**
+     * send post
+     */
+    send () {
+        try {
+           /* check item value */
+           let ret_chk = this.checkValue();
+           if (null !== ret_chk) {
+               this.message(ret_chk.cause);
+               return;
+           }
+           
+           /* init sender */
+           let xhr  = new XMLHttpRequest();
+           let form = this;
+           xhr.addEventListener(
+               'load',
+               function (evt) {
+                   try {
+                       mf.func.execFunc(
+                           form.callback(),
+                           new mf.Param(JSON.parse(this.response), form)
+                       );
+                   } catch (e) {
+                       console.error(e.stack);
+                       throw e;
+                   }
+               }
+           );
+           if (null === this.uri()) {
+               throw new Error('could not find uri');
+           }
+           xhr.open('POST', this.uri());
+           let send_val = this.getValue();
+           let optprm   = this.optionParam();
+           if (null !== optprm) {
+               for (let oidx in optprm) {
+                   send_val[oidx] = optprm[oidx];
+               }
+           }
+           
+           /* execute send event */
+           mf.func.execFunc(this.sendEvent());
+           
+           /* send post */
+           xhr.send(JSON.stringify(send_val));
+        } catch (e) {
+            console.error(e.stack);
+            throw e;
+        }
+    }
+    
+    /**
+     * setter/getter send uri
+     *
+     * @param p1 (string) send uri
+     * @param p1 (undefined) call as getter
+     * @return (string) send uri
+     */
+    uri (prm) {
+        try { return this.member('uri', 'string', prm, null); } catch (e) {
+            console.error(e.stack);
+            throw e;
+        }
+    }
+    
+    /**
+     * check form item value
+     */
     checkValue () {
         try {
-            let items = this.getItems();
-            if (null === items) {
-                this.msgText('internal error');
-                return;
-            }
-            /* check form item value */
-            let ret_chk = null;
+            let items    = this.getItems();
+            let ret_chk  = null;
+            let form_idx = 0;
+            
             for (let idx in items) {
+                /* null check */
                 ret_chk = items[idx].checkValue();
                 if (null !== ret_chk) {
-                    this.msgText(ret_chk);
-                    return;
+                    return {
+                        index : idx,
+                        cause : ret_chk
+                    };
                 }
             }
             /* reset message */
-            this.msgText(null);
+            this.message(null);
+            return null;
         } catch (e) {
             console.error(e.stack);
             throw e;
         }
     }
     
-    value () {
+    /**
+     * get form item value
+     */
+    getValue () {
         try {
             let ret_val = {};
             let items   = this.getItems();
             let val_nm  = null;
-            if (null === items) {
-                return null;
-            }
             /* get item value */
             for (var idx in items) {
                 val_nm = items[idx].sendKey();
-                ret_val[(null === val_nm)? 'prm_' + idx : val_nm] = items[idx].value();
-            }
-            /* get option param */
-            let optprm = this.optionParam();
-            for (let oidx in optprm) {
-                ret_val[oidx] = optprm[oidx];
+                ret_val[(null === val_nm) ? 'prm_' + idx : val_nm] = items[idx].value();
             }
             return ret_val;
         } catch (e) {
@@ -258,139 +248,96 @@ mf.comp.Form = class extends mf.Component {
         }
     }
     
+    /**
+     * message component setter/getter
+     *
+     * @param p1 (Message) message component
+     * @param p1 (string) message text
+     * @param p1 (undefined) call as getter
+     * @return (Message) message component
+     */
     message (prm) {
         try {
-            if (undefined === prm) {
-                /* getter */
-                if (undefined === this.m_message) {
-                    this.message(
-                        new Message({
-                            effect  : [ new HrzPos('center') ],
-                            width   : '70%',
-                            text    : '',
-                            color   : new mf.Color(200,60,60),
-                            visible : false
-                        })
-                    );
-                }
-                return this.m_message;
-            }
-            /* setter */
-            if (true !== mf.func.isInclude(prm, 'Message')) {
-                throw new Error('invalid parameter');
-            }
-            this.m_message = prm;
-        } catch (e) {
-            console.error(e.stack);
-            throw e;
-        }
-    }
-    
-    msgText (prm) {
-        try {
-            if (undefined === prm) {
-                /* getter */
-                return this.message().text();
-            }
-            /* setter */
-            if (null === prm) {
-                this.message().visible(false);
+            if (true === mf.func.isInclude(prm, 'Message')) {
+                prm.execOption({
+                    width   : '100%',
+                    visible : false
+                });
+            } else if (null === prm) {
+                this.message().execOption({
+                    text    : "",
+                    visible : false
+                });
+                return;
             } else if ('string' === typeof prm) {
-                this.message().visible(true);
-                this.message().text(prm);
-            } else {
-                throw new Error('invalid parameter');
+                this.message().execOption({
+                    text    : prm,
+                    visible : true
+                });
+                return;
             }
+            return this.innerComp('message', prm, Message);
         } catch (e) {
             console.error(e.stack);
             throw e;
         }
     }
     
-    msgEvent (fnc, prm) {
+    /**
+     * submit component setter/getter
+     *
+     * @param p1 (Button) submit component
+     * @param p1 (undefined) call as getter
+     * @return (Button) submit component
+     */
+    submitConts (prm) {
         try {
-            if (undefined === fnc) {
-                /* getter */
-                return (undefined === this.m_msg_evt) ? [null, null] : this.m_msg_evt;
+            if (true === mf.func.isInclude(prm, 'Button')) {
+                let clk = (p1,p2,p3) => {
+                    try { p2.send(); } catch (e) {
+                        console.error(e.stack);
+                        throw e;
+                    }
+                };
+                prm.execOption({
+                    sizeValue  : [ 'margin-top', '0.2rem' ],
+                    width      : '1.2rem',
+                    effect     : new Hrzpos({
+                                     type    : 'center',
+                                     suspend : true
+                                 }),
+                    clickEvent : [clk, this]
+                });
+            } else if ('string' === typeof prm) {
+                this.submitConts().execOption({ text : prm });
+                return;
             }
-            /* setter */
-            if ('function' !== typeof fnc) {
-                throw new Error('invalid paramter');
-            }
-            this.m_msg_evt = new Array(fnc, prm);
-        } catch (e) {
-            console.error(e.stack);
-            throw e;          
-        }
-    }
-    
-    submitTgt (prm) {
-        try {
-            if (undefined === prm) {
-                /* getter */
-                return (undefined === this.m_sbmtgt) ? null : this.m_sbmtgt;
-            }
-            /* setter */
-            if (true !== mf.func.isInclude(prm, 'Dom')) {
-                throw new Error('invalid paramter');
-            }
-            this.m_sbmtgt = prm;
-        } catch (e) {
-            console.error(e.stack);
-            throw e;
-        }
-    }
-    
-    submitComp (prm) {
-        try {
-            if (undefined === prm) {
-                /* getter */
-                if (undefined === this.m_submit) {
-                    this.submitComp(
-                        new Button({
-                            effect     : [ new HrzPos('center') ],
-                            text       : 'Send',
-                            size       : new mf.Param('1rem', '0.3rem'),
-                            sizeValue  : new mf.Param('margin-top', '0.1rem'),
-                            clickEvent : new mf.Param(
-                                (sub, form) => {
-                                    try { form.send(); } catch (e) {
-                                        console.error(e.stack);
-                                        throw e;
-                                    } 
-                                },
-                                this
-                            )
-                        })
-                    );
-                }
-                return this.m_submit;
-            }
-            /* setter */
-            if (true !== mf.func.isInclude(prm, 'Component')) {
-                throw new Error('invalid parameter');
-            }
-            this.m_submit = prm;
+            return this.innerComp('submitConts', prm, Button);
         } catch (e) {
             console.error(e.stack);
             throw e;
         }
     }
     
+    /**
+     * width setter/getter
+     */
     width (prm) {
         try {
             let ret = super.width(prm);
-            if (undefined === ret) {
-                this.adom().child()[0].style({
-                    width : prm
-                });
+            if (undefined !== prm) {
+                this.submitConts().effect('HrzPos').suspend(false);
             }
+            return ret;
         } catch (e) {
             console.error(e.stack);
             throw e;
         }
     }
     
+    /**
+     * clear form items
+     */
     clear () {
         try {
             let item = this.getItems();
@@ -404,6 +351,11 @@ mf.comp.Form = class extends mf.Component {
         }
     }
     
+    /**
+     * get form item list
+     *
+     * @return (array) form item list
+     */
     getItems () {
         try {
             let ret = new Array();
@@ -413,23 +365,26 @@ mf.comp.Form = class extends mf.Component {
                     ret.push(chd[cidx]);
                 }
             }
-            return (0 === ret.length) ? null : ret;
+            return (0 === ret.length) ? [] : ret;
         } catch (e) {
             console.error(e.stack);
             throw e;
         }
     }
     
+    /**
+     * extend post parameter setter/getter
+     *
+     * @param p1 (object) extend parameter
+     * @param p1 (undefined) call as getter
+     * @return (object) extend parameter
+     */
     optionParam (prm) {
-        if (undefined === prm) {
-            /* getter */
-            return (undefined === this.m_optprm) ? [] : this.m_optprm;
+        try { return this.member('optionParam', 'object', prm); } catch (e) {
+            console.error(e.stack);
+            throw e;
         }
-        if ('object' !== typeof prm) {
-            throw new Error('invalid parameter');
-        }
-        this.m_optprm = prm;
     }
 }
-module.exports = mf.comp.Form;
+module.exports = mofron.comp.Form;
 /* end of file */
