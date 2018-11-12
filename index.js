@@ -44,10 +44,14 @@ mf.comp.Form = class extends mf.Component {
             });
             this.child([ conts, btn ]);
             this.submitConts('Submit');
+
             this.target(conts.target());
-            
+            this.styleTgt(this.target());
+
             /* add enter key event */
             this.initKeyEvent();
+            
+            this.width('100%');
         } catch (e) {
             console.error(e.stack);
             throw e;
@@ -300,12 +304,8 @@ mf.comp.Form = class extends mf.Component {
                     }
                 };
                 prm.execOption({
-                    sizeValue  : [ 'margin-top', '0.2rem' ],
-                    width      : '1.2rem',
-                    effect     : new Hrzpos({
-                                     type    : 'center',
-                                     suspend : true
-                                 }),
+                    size       : [ '1.2rem', '0.27rem' ]    ,
+                    effect     : new Hrzpos('center')      ,
                     clickEvent : [clk, this]
                 });
             } else if ('string' === typeof prm) {
@@ -313,22 +313,6 @@ mf.comp.Form = class extends mf.Component {
                 return;
             }
             return this.innerComp('submitConts', prm, Button);
-        } catch (e) {
-            console.error(e.stack);
-            throw e;
-        }
-    }
-    
-    /**
-     * width setter/getter
-     */
-    width (prm) {
-        try {
-            let ret = super.width(prm);
-            if (undefined !== prm) {
-                this.submitConts().effect('HrzPos').suspend(false);
-            }
-            return ret;
         } catch (e) {
             console.error(e.stack);
             throw e;
