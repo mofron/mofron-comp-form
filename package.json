@@ -1,6 +1,6 @@
 {
   "name": "mofron-comp-form",
-  "version": "0.9.1",
+  "version": "0.9.2",
   "description": "form Component for mofron",
   "main": "index.js",
   "scripts": {
@@ -12,7 +12,8 @@
   },
   "dependencies": {
     "mofron-effect-hrzpos" : "",
-    "mofron-effect-syncwid" : ""
+    "mofron-effect-syncwid" : "",
+    "mofron-comp-errmsg" : ""
   },
   "keywords": [
     "front-end"
