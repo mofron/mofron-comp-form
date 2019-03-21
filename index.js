@@ -39,8 +39,7 @@ mf.comp.Form = class extends mf.Component {
             /* component contents */
             let conts = new mf.Component(this.message());
             let btn   = new mf.Component({
-                effect : new Synwid(this),
-                child  : this.submitConts()
+                effect: new Synwid(this), child: this.submitConts()
             });
             this.child([ conts, btn ]);
             this.submitConts('Submit');
@@ -268,16 +267,10 @@ mf.comp.Form = class extends mf.Component {
                     visible : false
                 });
             } else if (null === prm) {
-                this.message().execOption({
-                    text    : "",
-                    visible : false
-                });
+                this.message().option({ text: "", visible: false });
                 return;
             } else if ('string' === typeof prm) {
-                this.message().execOption({
-                    text    : prm,
-                    visible : true
-                });
+                this.message().option({ text: prm, visible: true });
                 return;
             }
             return this.innerComp('message', prm, Message);
@@ -298,18 +291,17 @@ mf.comp.Form = class extends mf.Component {
         try {
             if (true === mf.func.isInclude(prm, 'Button')) {
                 let clk = (p1,p2,p3) => {
-                    try { p2.send(); } catch (e) {
+                    try { p3.send(); } catch (e) {
                         console.error(e.stack);
                         throw e;
                     }
                 };
-                prm.execOption({
-                    size       : [ '1.2rem', '0.27rem' ]    ,
-                    effect     : new Hrzpos('center')      ,
+                prm.option({
+                    size: [ '1.2rem', '0.27rem' ], effect: new Hrzpos('center'),
                     clickEvent : [clk, this]
                 });
             } else if ('string' === typeof prm) {
-                this.submitConts().execOption({ text : prm });
+                this.submitConts().option({ text : prm });
                 return;
             }
             return this.innerComp('submitConts', prm, Button);
