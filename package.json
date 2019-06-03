@@ -12,7 +12,6 @@
   },
   "dependencies": {
     "mofron-comp-button" : "",
-    "mofron-comp-errmsg" : "",
     "mofron-effect-hrzpos" : "",
     "mofron-effect-syncwid" : "",
     "mofron-comp-errmsg" : ""
