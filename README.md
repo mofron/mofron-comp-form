@@ -1,31 +1,56 @@
 # mofron-comp-form
-form component for [mofron](https://github.com/simpart/mofron)
-this component defined form interface. not for display.
+[mofron](https://mofron.github.io/mofron/) is module based frontend framework.
+
+form component for [mofron](https://mofron.github.io/mofron/).
+
+## feature
+
+- send POST when submit component is clicked.
+- check automatically form item values.
+- show an error message if form item check is false.
+
+## attention
+
+- form component child must be a formitem component.
+
+# Install
+
+```
+npm install mofron mofron-comp-form
+```
 
 # Sample
 
-```javascript
-require('mofron');
-let Form   = require('mofron-comp-form');
-let Input  = require('mofron-comp-inputtext');
-let Button = require('mofron-comp-button');
+```html
+<require>
+    <tag module="mofron-comp-form">Form</tag>
+    <tag module="mofron-comp-dropdown">DropDown</tag>
+    <tag module="mofron-comp-input">Input</tag>
+    <tag module="mofron-layout-margin">Margin</tag>
+</require>
 
-let send_btn = new Button('send');
-let form = new Form({
-    param   : '/path/to/server/program',
-    child   : [new Input(),
-                   send_btn],
-    visible : true
-});
+<script run=init>
+let evt = (p1,p2,p3) => { console.log(p2); }
+</script>
 
-send_btn.clickEvent(
-    function (frm) {
-        try {
-            frm.send();
-        } catch (e) {
-            console.error(e.stack);
-        }
-    },
-    form
-);
+<Form sendEvent=evt layout=Margin(null,"0.2rem") width="3rem">
+    <Input sendKey="input"></Input>
+    <DropDown sendKey="dropdown">
+        <text>test 1</text>
+        <text>test 2</text>
+        <text>test 3</text>
+    </DropDown>
+</Form>
 ```
+
+# Parameter
+
+| Simple<br>Param | Parameter Name     | Type             |    Description                          |
+|:---------------:|:-------------------|:-----------------|:----------------------------------------|
+|                 | callback           | function         | send result event function              |
+|                 |                    | mixed            | callback function parameter             |
+|                 | sendEvent          | function         | send event function (call before send)  |       
+|                 |                    | mixed            | event parameter                         |
+|        ◯        | uri                | string           | send uri                                |
+|                 | submitConts        | string/component | submit text contents / submit component |
+|                 | optionParam        | object           | extend post parameter                   |
