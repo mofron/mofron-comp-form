@@ -1,26 +1,31 @@
 /**
  * @file mofron-comp-form/index.js
+ * @brief form component for mofron
+ * @feature send POST when submit component is clicked.
+ *          check automatically form item values.
+ *          show an error message if form item check is false.
+ * @attention form component child must be a formitem component.
  * @author simpart
  */
-const mf      = require('mofron');
-const Button  = require('mofron-comp-button');
-const Message = require('mofron-comp-errmsg');
-const Hrzpos  = require('mofron-effect-hrzpos');
-const Synwid  = require('mofron-effect-syncwid');
+const mf      = require("mofron");
+const Button  = require("mofron-comp-button");
+const Message = require("mofron-comp-errmsg");
+const Hrzpos  = require("mofron-effect-hrzpos");
+const Synwid  = require("mofron-effect-syncwid");
 
 mf.comp.Form = class extends mf.Component {
     /**
      * initialize form component
-     *
-     * @param p1 (object) component option
-     * @param p1 (string) path to uri
-     * @param p2 (component) form child component
+     * 
+     * @param (string) 'uri' parameter
+     * @param (component) 'child' parameter
+     * @type private
      */
     constructor (po, p2) {
         try {
             super();
-            this.name('Form');
-            this.prmMap(['uri', 'child']);
+            this.name("Form");
+            this.prmMap(["uri", "child"]);
             this.prmOpt(po, p2);
         } catch (e) {
             console.error(e.stack);
@@ -31,26 +36,29 @@ mf.comp.Form = class extends mf.Component {
     /**
      * initialize dom contents
      *
-     * @note private method
+     * @type private
      */
     initDomConts () {
         try {
             super.initDomConts();
+            
             /* component contents */
             let conts = new mf.Component(this.message());
-            let btn   = new mf.Component({
-                effect: new Synwid(this), child: this.submitConts()
-            });
-            this.child([ conts, btn ]);
-            this.submitConts('Submit');
-
+            this.child([
+                conts,
+                new mf.Component({
+                    effect: new Synwid(this), child: this.submitConts()
+                })
+            ]);
+            this.submitConts(new Button("Submit"));
+            
             this.target(conts.target());
             this.styleTgt(this.target());
-
+            
             /* add enter key event */
             this.initKeyEvent();
             
-            this.width('100%');
+            this.width("100%");
         } catch (e) {
             console.error(e.stack);
             throw e;
@@ -60,7 +68,7 @@ mf.comp.Form = class extends mf.Component {
     /**
      * add enter key event
      *
-     * @note private method
+     * @type private
      */
     initKeyEvent () {
         try {
@@ -91,20 +99,21 @@ mf.comp.Form = class extends mf.Component {
     }
     
     /**
-     * setter/getter callback function for send
+     * event function for after sending
      * 
-     * @param p1 (function) send event function
-     * @param p1 (undefined) call as getter
-     * @param p2 (mix) event parameter
+     * @param (function) send event function
+     * @param (mix) event parameter
      * @return (array) send event array
+     * @type tag parameter
      */
     callback (fnc, prm) {
         try {
-            if ( (undefined !== fnc) && ('function' !== typeof fnc)) {
-                throw new Error('invalid parameter');
+            if ( (undefined !== fnc) && ("function" !== typeof fnc)) {
+                throw new Error("invalid parameter");
             }
             return this.arrayMember(
-                'callback', ['function', null],
+                "callback",
+                "object",
                 (undefined !== fnc) ? [fnc, prm] : undefined
             );
         } catch (e) {
@@ -114,21 +123,21 @@ mf.comp.Form = class extends mf.Component {
     }
     
     /**
-     * send event setter/getter
-     * call function before send
+     * event function for before send
      * 
-     * @param p1 (function) send event function
-     * @param p1 (undefined) call as getter
-     * @param p2 (mix) event parameter
+     * @param (function) send event function
+     * @param (mix) event parameter
      * @return (array) send event array
+     * @type tag parameter
      */
     sendEvent (fnc, prm) {
         try {
-            if ( (undefined !== fnc) && ('function' !== typeof fnc)) {
-                throw new Error('invalid parameter');
+            if ( (undefined !== fnc) && ("function" !== typeof fnc)) {
+                throw new Error("invalid parameter");
             }
             return this.arrayMember(
-                'sendEvent', ['function', null],
+                "sendEvent",
+                "object",
                 (undefined !== fnc) ? [fnc, prm] : undefined
             );
         } catch (e) {
@@ -139,6 +148,8 @@ mf.comp.Form = class extends mf.Component {
     
     /**
      * send post
+     *
+     * @type private
      */
     send () {
         try {
@@ -156,18 +167,26 @@ mf.comp.Form = class extends mf.Component {
                'load',
                function (evt) {
                    try {
-                       mf.func.execFunc(
-                           form.callback(),
-                           new mf.Param(JSON.parse(this.response), form)
-                       );
+                       let cbs = form.callback();
+                       for (let cidx in cbs) {
+                           cbs[cidx][0](form, JSON.parse(this.response), cbs[cidx][1]);
+                       }
                    } catch (e) {
                        console.error(e.stack);
                        throw e;
                    }
                }
            );
+           
+           /* execute send event */
+           let sev = this.sendEvent();
+           for (let sev_idx in sev) {
+               sev[sev_idx][0](this, this.getValue(), sev[sev_idx][1]);
+           }
+           
            if (null === this.uri()) {
-               throw new Error('could not find uri');
+               console.warn("could not find send uri");
+               return;
            }
            xhr.open('POST', this.uri());
            let send_val = this.getValue();
@@ -178,9 +197,6 @@ mf.comp.Form = class extends mf.Component {
                }
            }
            
-           /* execute send event */
-           mf.func.execFunc(this.sendEvent());
-           
            /* send post */
            xhr.send(JSON.stringify(send_val));
         } catch (e) {
@@ -190,14 +206,14 @@ mf.comp.Form = class extends mf.Component {
     }
     
     /**
-     * setter/getter send uri
-     *
-     * @param p1 (string) send uri
-     * @param p1 (undefined) call as getter
+     * send uri
+     * 
+     * @param (string) send uri
      * @return (string) send uri
+     * @type tag parameter
      */
     uri (prm) {
-        try { return this.member('uri', 'string', prm, null); } catch (e) {
+        try { return this.member("uri", "string", prm, null); } catch (e) {
             console.error(e.stack);
             throw e;
         }
@@ -205,6 +221,8 @@ mf.comp.Form = class extends mf.Component {
     
     /**
      * check form item value
+     * 
+     * @type private
      */
     checkValue () {
         try {
@@ -233,6 +251,8 @@ mf.comp.Form = class extends mf.Component {
     
     /**
      * get form item value
+     * 
+     * @type funtion
      */
     getValue () {
         try {
@@ -252,28 +272,24 @@ mf.comp.Form = class extends mf.Component {
     }
     
     /**
-     * message component setter/getter
-     *
-     * @param p1 (Message) message component
-     * @param p1 (string) message text
-     * @param p1 (undefined) call as getter
-     * @return (Message) message component
+     * message component
+     * 
+     * @param (string/mofron-comp-message) message text/message component
+     * @return (mofron-comp-message) message component
+     * @type function
      */
     message (prm) {
         try {
             if (true === mf.func.isInclude(prm, 'Message')) {
-                prm.execOption({
-                    width   : '100%',
-                    visible : false
-                });
+                prm.option({ width: '100%', visible: false });
             } else if (null === prm) {
                 this.message().option({ text: "", visible: false });
                 return;
-            } else if ('string' === typeof prm) {
+            } else if ("string" === typeof prm) {
                 this.message().option({ text: prm, visible: true });
                 return;
             }
-            return this.innerComp('message', prm, Message);
+            return this.innerComp("message", prm, Message);
         } catch (e) {
             console.error(e.stack);
             throw e;
@@ -281,15 +297,15 @@ mf.comp.Form = class extends mf.Component {
     }
     
     /**
-     * submit component setter/getter
+     * submit component
      *
-     * @param p1 (Button) submit component
-     * @param p1 (undefined) call as getter
-     * @return (Button) submit component
+     * @param (string/mofron-comp-component) submit text contents / submit component
+     * @return (mofron-comp-component) submit component
+     * @type tag parameter
      */
     submitConts (prm) {
         try {
-            if (true === mf.func.isInclude(prm, 'Button')) {
+            if (true === mf.func.isComp(prm)) {
                 let clk = (p1,p2,p3) => {
                     try { p3.send(); } catch (e) {
                         console.error(e.stack);
@@ -297,14 +313,14 @@ mf.comp.Form = class extends mf.Component {
                     }
                 };
                 prm.option({
-                    size: [ '1.2rem', '0.27rem' ], effect: new Hrzpos('center'),
-                    clickEvent : [clk, this]
+                    size: ["1.2rem","0.27rem"], effect: new Hrzpos("center"),
+                    clickEvent: [clk, this]
                 });
-            } else if ('string' === typeof prm) {
+            } else if ("string" === typeof prm) {
                 this.submitConts().option({ text : prm });
                 return;
             }
-            return this.innerComp('submitConts', prm, Button);
+            return this.innerComp("submitConts", prm, mf.Component);
         } catch (e) {
             console.error(e.stack);
             throw e;
@@ -313,6 +329,8 @@ mf.comp.Form = class extends mf.Component {
     
     /**
      * clear form items
+     *
+     * @type function
      */
     clear () {
         try {
@@ -331,13 +349,14 @@ mf.comp.Form = class extends mf.Component {
      * get form item list
      *
      * @return (array) form item list
+     * @type private
      */
     getItems () {
         try {
             let ret = new Array();
             let chd = this.child();
             for (let cidx in chd) {
-                if (true === mf.func.isInclude(chd[cidx], 'FormItem')) {
+                if (true === mf.func.isInclude(chd[cidx], "FormItem")) {
                     ret.push(chd[cidx]);
                 }
             }
@@ -351,9 +370,9 @@ mf.comp.Form = class extends mf.Component {
     /**
      * extend post parameter setter/getter
      *
-     * @param p1 (object) extend parameter
-     * @param p1 (undefined) call as getter
+     * @param (object) extend parameter
      * @return (object) extend parameter
+     * @type tag parameter
      */
     optionParam (prm) {
         try { return this.member('optionParam', 'object', prm); } catch (e) {
