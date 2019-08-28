@@ -12,13 +12,15 @@ const Button  = require("mofron-comp-button");
 const Message = require("mofron-comp-errmsg");
 const Hrzpos  = require("mofron-effect-hrzpos");
 const Synwid  = require("mofron-effect-syncwid");
+const Margin  = require('mofron-layout-margin');
 
 mf.comp.Form = class extends mf.Component {
     /**
      * initialize form component
      * 
-     * @param (string) 'uri' parameter
-     * @param (component) 'child' parameter
+     * @param (mixed) string: uri parameter
+     *                object: component option
+     * @param (component) child parameter
      * @type private
      */
     constructor (po, p2) {
@@ -41,6 +43,9 @@ mf.comp.Form = class extends mf.Component {
     initDomConts () {
         try {
             super.initDomConts();
+            this.layout(
+	        new Margin({ type:"top", value: "0rem", tag: "Form" })
+	    );
             
             /* component contents */
             let conts = new mf.Component(this.message());
@@ -53,11 +58,9 @@ mf.comp.Form = class extends mf.Component {
             this.submitConts(new Button("Submit"));
             
             this.target(conts.target());
-            this.styleTgt(this.target());
             
             /* add enter key event */
             this.initKeyEvent();
-            
             this.width("100%");
         } catch (e) {
             console.error(e.stack);
@@ -65,6 +68,27 @@ mf.comp.Form = class extends mf.Component {
         }
     }
     
+    /**
+     * margin top layout config
+     * 
+     * @param (string (size)) margin top size
+     * @return (string) margin top size
+     * @type parameter
+     */
+    marginTop (prm) {
+        try {
+	    let mgn = this.layout(["Margin", "Form"]);
+	    let ret = mgn.value(prm);
+	    if (undefined !== prm) {
+                this.submitConts().style({ "margin-top": prm });
+	    }
+	    return ret;
+	} catch (e) {
+	    console.error(e.stack);
+	    throw e;
+        }
+    }
+
     /**
      * add enter key event
      *
@@ -104,7 +128,7 @@ mf.comp.Form = class extends mf.Component {
      * @param (function) send event function
      * @param (mix) event parameter
      * @return (array) send event array
-     * @type tag parameter
+     * @type parameter
      */
     callback (fnc, prm) {
         try {
@@ -128,7 +152,7 @@ mf.comp.Form = class extends mf.Component {
      * @param (function) send event function
      * @param (mix) event parameter
      * @return (array) send event array
-     * @type tag parameter
+     * @type parameter
      */
     sendEvent (fnc, prm) {
         try {
@@ -210,7 +234,7 @@ mf.comp.Form = class extends mf.Component {
      * 
      * @param (string) send uri
      * @return (string) send uri
-     * @type tag parameter
+     * @type parameter
      */
     uri (prm) {
         try { return this.member("uri", "string", prm, null); } catch (e) {
@@ -274,7 +298,8 @@ mf.comp.Form = class extends mf.Component {
     /**
      * message component
      * 
-     * @param (string/mofron-comp-message) message text/message component
+     * @param (mixed) text/mofron-comp-text: message contents
+     *                mofron-comp-message: replace message component
      * @return (mofron-comp-message) message component
      * @type function
      */
@@ -298,10 +323,11 @@ mf.comp.Form = class extends mf.Component {
     
     /**
      * submit component
-     *
-     * @param (string/mofron-comp-component) submit text contents / submit component
-     * @return (mofron-comp-component) submit component
-     * @type tag parameter
+     * 
+     * @param (mixed) string: submit text contents
+     *                component: submit component
+     * @return (component) submit component
+     * @type parameter
      */
     submitConts (prm) {
         try {
@@ -372,10 +398,45 @@ mf.comp.Form = class extends mf.Component {
      *
      * @param (object) extend parameter
      * @return (object) extend parameter
-     * @type tag parameter
+     * @type parameter
      */
     optionParam (prm) {
         try { return this.member('optionParam', 'object', prm); } catch (e) {
+            console.error(e.stack);
+            throw e;
+        }
+    }
+    
+    /**
+     * form height setter/getter
+     * 
+     * @param (string (size)) form height
+     * @param (option) style option
+     * @return (string (size)) form height
+     * @type parameter
+     */
+    height (prm, opt) {
+        try {
+	    if (undefined === prm) {
+                let ret = "0rem";
+                /* add message height */
+                if (true === this.message().visible()) {
+                    ret = mf.func.sizeSum(ret, this.message().height(), this.marginTop());
+                }
+                let chd = this.child();
+                if (true === mf.func.isInclude(chd[0],"Message")) {
+                    chd.splice(0, 1);
+                }
+                /* add formitem height */
+                for (let cidx in chd) {
+                    ret = mf.func.sizeSum(ret, chd[cidx].height(), this.marginTop());
+                }
+                /* add submit height */
+	        return mf.func.sizeSum(ret, this.submitConts().height(), this.marginTop());
+	    }
+	    /* setter */
+            super.height(prm, opt);
+        } catch (e) {
             console.error(e.stack);
             throw e;
         }
