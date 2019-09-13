@@ -340,6 +340,7 @@ mf.comp.Form = class extends mf.Component {
                 };
                 prm.option({
                     size: ["1.2rem","0.27rem"], effect: new Hrzpos("center"),
+		    style: { "margin-top" : "0.3rem" },
                     clickEvent: [clk, this]
                 });
             } else if ("string" === typeof prm) {
