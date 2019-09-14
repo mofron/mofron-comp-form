@@ -309,9 +309,11 @@ mf.comp.Form = class extends mf.Component {
                 prm.option({ width: '100%', visible: false });
             } else if (null === prm) {
                 this.message().option({ text: "", visible: false });
+		this.height(this.height());
                 return;
             } else if ("string" === typeof prm) {
                 this.message().option({ text: prm, visible: true });
+		this.height(this.height());
                 return;
             }
             return this.innerComp("message", prm, Message);
@@ -420,9 +422,15 @@ mf.comp.Form = class extends mf.Component {
         try {
 	    if (undefined === prm) {
                 let ret = "0rem";
+		let mgn = null;
                 /* add message height */
                 if (true === this.message().visible()) {
-                    ret = mf.func.sizeSum(ret, this.message().height(), this.marginTop());
+		    mgn = this.message().adom().style("margin-top");
+                    ret = mf.func.sizeSum(
+		        ret,
+			this.message().height(),
+			(null !== mgn) ? mgn : undefined
+	            );
                 }
                 let chd = this.child();
                 if (true === mf.func.isInclude(chd[0],"Message")) {
@@ -430,10 +438,20 @@ mf.comp.Form = class extends mf.Component {
                 }
                 /* add formitem height */
                 for (let cidx in chd) {
-                    ret = mf.func.sizeSum(ret, chd[cidx].height(), this.marginTop());
+		    mgn = chd[cidx].adom().style("margin-top");
+                    ret = mf.func.sizeSum(
+		        ret,
+			chd[cidx].height(),
+			(null !== mgn) ? mgn : undefined
+		    );
                 }
                 /* add submit height */
-	        return mf.func.sizeSum(ret, this.submitConts().height(), this.marginTop());
+		mgn = this.submitConts().adom().style("margin-top");
+	        return mf.func.sizeSum(
+		    ret,
+		    this.submitConts().height(),
+		    (null !== mgn) ? mgn : undefined
+		);
 	    }
 	    /* setter */
             super.height(prm, opt);
