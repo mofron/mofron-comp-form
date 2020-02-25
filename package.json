@@ -1,6 +1,6 @@
 {
   "name": "mofron-comp-form",
-  "version": "0.10.3",
+  "version": "0.11.0",
   "description": "form Component for mofron",
   "main": "index.js",
   "scripts": {
@@ -12,12 +12,15 @@
   },
   "dependencies": {
     "mofron-comp-button" : "",
+    "mofron-comp-errmsg" : "",
     "mofron-effect-hrzpos" : "",
     "mofron-effect-syncwid" : "",
-    "mofron-comp-errmsg" : ""
+    "mofron-layout-margin" : "",
+    "mofron-event-click" : "",
+    "mofron-event-key" : ""
   },
   "keywords": [
-    "front-end"
+    "front-end", "mofron"
   ],
   "author": "simparts",
   "license": "MIT",

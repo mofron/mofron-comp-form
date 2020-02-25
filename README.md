@@ -17,17 +17,26 @@ npm install mofron mofron-comp-form
 
 # Parameter
 
-|Simple<br>Param | Parameter Name | Type | Description |
-|:--------------:|:---------------|:-----|:------------|
-| | marginTop | string (size) | margin top size |
+| Short<br>Form | Parameter Name | Type | Description |
+|:-------------:|:---------------|:-----|:------------|
+| | getChildHeight | ||
+| | enterSend | boolean | true: send form data when user press enter |
+| | | | false: not send (default) |
 | | callback | function | send event function |
 | | | mix | event parameter |
 | | sendEvent | function | send event function |
 | | | mix | event parameter |
+| | sendfunc | function | user defined send function |
+| | | mixed | function parameter |
 | | uri | string | send uri |
-| | submitConts | mixed | string: submit text contents |
+| | getValue | ||
+| | message | mixed | text/mofron-comp-text: message contents |
+| | | | mofron-comp-message: replace message component |
+| | | | undefined: call as getter |
+| | submitComp | mixed | string: submit text contents |
 | | | | component: submit component |
-| | optionParam | object | extend parameter |
-| | height | string (size) | form height |
-| | | option | style option |
+| | | | undefined: call as getter |
+| | clear | ||
+| | extParam | object | extend parameter |
+| | | | undefined: call as getter |
 
