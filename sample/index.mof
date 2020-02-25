@@ -1,0 +1,16 @@
+<require>
+    <tag load="mofron-comp-form">Form</tag>
+    <tag load="mofron-comp-input">Input</tag>
+    <tag load="mofron-comp-radiolist">RadioList</tag>
+    <tag load="mofron-comp-textarea">TextArea</tag>
+    <tag load="mofron-layout-margin">Margin</tag>
+</require>
+
+<Form width="4rem" layout=Margin:("top","0.2rem")>
+    <Input label="input:"></Input>
+    <RadioList layout=Margin:("left","0.1rem")>
+        <radio>radio_1</radio>
+        <radio>radio_2</radio>
+    </RadioList>
+    <TextArea label="textarea:"></TextArea>
+</Form>
