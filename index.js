@@ -14,7 +14,6 @@ const Synwid  = require("mofron-effect-syncwid");
 const Margin  = require("mofron-layout-margin");
 const Click   = require("mofron-event-click");
 const Key     = require("mofron-event-key");
-const ConfArg = mofron.class.ConfArg;
 const comutl = mofron.util.common;
 
 module.exports = class extends mofron.class.Component {
@@ -131,9 +130,7 @@ module.exports = class extends mofron.class.Component {
 		}
 	    }
 	    mofron.window.event(
-		new Key(
-		    new ConfArg(new ConfArg(fnc,this), "Enter")
-		)
+		new Key(new ConfArg(fnc,this), "Enter"))
             );
         } catch (e) {
             console.error(e.stack);
