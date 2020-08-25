@@ -1,10 +1,10 @@
-<require>
+<setting>
     <tag load="mofron-comp-form">Form</tag>
     <tag load="mofron-comp-input">Input</tag>
     <tag load="mofron-comp-radiolist">RadioList</tag>
     <tag load="mofron-comp-textarea">TextArea</tag>
     <tag load="mofron-layout-margin">Margin</tag>
-</require>
+</setting>
 
 <Form width="4rem" layout=Margin:("top","0.2rem")>
     <Input label="input:"></Input>

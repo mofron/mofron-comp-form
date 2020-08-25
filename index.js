@@ -28,7 +28,7 @@ module.exports = class extends mofron.class.Component {
     constructor (prm) {
         try {
             super();
-            this.name("Form");
+            this.modname("Form");
             /* init config */
 	    this.confmng().add("enterSend", { type: "boolean", init: false });
 	    this.confmng().add("callback", { type: "event", list: true });

@@ -17,13 +17,13 @@ npm install mofron mofron-comp-form
 
 # Sample
 ```html
-<require>
+<setting>
     <tag load="mofron-comp-form">Form</tag>
     <tag load="mofron-comp-input">Input</tag>
     <tag load="mofron-comp-radiolist">RadioList</tag>
     <tag load="mofron-comp-textarea">TextArea</tag>
     <tag load="mofron-layout-margin">Margin</tag>
-</require>
+</setting>
 
 <Form width="4rem" layout=Margin:("top","0.2rem")>
     <Input label="input:"></Input>
@@ -39,8 +39,7 @@ npm install mofron mofron-comp-form
 
 | Short<br>Form | Parameter Name | Type | Description |
 |:-------------:|:---------------|:-----|:------------|
-| | getChildHeight | ||
-| | enterSend | boolean | true: send form data when user press enter |
+| | getChildHeight | ||| | enterSend | boolean | true: send form data when user press enter |
 | | | | false: not send (default) |
 | | callback | function | send event function |
 | | | mix | event parameter |
@@ -49,14 +48,12 @@ npm install mofron mofron-comp-form
 | | sendfunc | function | user defined send function |
 | | | mixed | function parameter |
 | | uri | string | send uri |
-| | getValue | ||
-| | message | mixed | text/mofron-comp-text: message contents |
+| | getValue | ||| | message | mixed | text/mofron-comp-text: message contents |
 | | | | mofron-comp-message: replace message component |
 | | | | undefined: call as getter |
 | | submitComp | mixed | string: submit text contents |
 | | | | component: submit component |
 | | | | undefined: call as getter |
-| | clear | ||
-| | extParam | object | extend parameter |
+| | clear | ||| | extParam | object | extend parameter |
 | | | | undefined: call as getter |
 
