@@ -14,6 +14,7 @@ const Synwid  = require("mofron-effect-syncwid");
 const Margin  = require("mofron-layout-margin");
 const Click   = require("mofron-event-click");
 const Key     = require("mofron-event-key");
+const ConfArg = mofron.class.ConfArg;
 const comutl = mofron.util.common;
 
 module.exports = class extends mofron.class.Component {
@@ -35,7 +36,7 @@ module.exports = class extends mofron.class.Component {
             this.confmng().add("sendEvent", { type: "event", list: true });
             this.confmng().add("uri", { type: "string" });
             this.confmng().add('extParam', { type: "key-value" });
-	    this.confmng().add("sendfunc", { type: "event" });
+	    this.confmng().add("submitFunc", { type: "event" });
 	    /* set config */
 	    if (undefined !== prm) {
                 this.config(prm);
@@ -130,7 +131,7 @@ module.exports = class extends mofron.class.Component {
 		}
 	    }
 	    mofron.window.event(
-		new Key(new ConfArg(fnc,this), "Enter"))
+		new Key(new ConfArg(fnc,this), "Enter")
             );
         } catch (e) {
             console.error(e.stack);
@@ -180,78 +181,24 @@ module.exports = class extends mofron.class.Component {
      * @return (array) send event array
      * @type parameter
      */
-    sendEvent (fnc, prm) {
-        try {
-	    return this.confmng("sendEvent", fnc, prm);
-        } catch (e) {
-            console.error(e.stack);
-            throw e;
-        }
-    }
+    //sendEvent (fnc, prm) {
+    //    try {
+//	    return this.confmng("sendEvent", fnc, prm);
+//        } catch (e) {
+//            console.error(e.stack);
+//            throw e;
+//        }
+//    }
     
-    /**
-     * send post
-     *
-     * @type private
-     */
-    send () {
-        try {
-	   if (null !== this.sendfunc()) {
-	       let sfnc = this.sendfunc();
-	       sfnc[0](sfnc[1]);
-               return;
-	   }
-           /* check item value */
-           let ret_chk = this.checkValue();
-           if (null !== ret_chk) {
-               this.message(ret_chk.cause);
-               return;
-           }
-           
-           /* init sender */
-           let xhr  = new XMLHttpRequest();
-           let form = this;
-           xhr.addEventListener(
-               'load',
-               function (evt) {
-                   try {
-                       let cbs = form.callback();
-                       for (let cidx in cbs) {
-                           cbs[cidx][0](form, JSON.parse(this.response), cbs[cidx][1]);
-                       }
-                   } catch (e) {
-                       console.error(e.stack);
-                       throw e;
-                   }
-               }
-           );
-           
-           /* execute send event */
-           let sev = this.sendEvent();
-           for (let sev_idx in sev) {
-               sev[sev_idx][0](this, this.getValue(), sev[sev_idx][1]);
-           }
-           
-           if (null === this.uri()) {
-               console.warn("could not find send uri");
-               return;
-           }
-           xhr.open('POST', this.uri());
-           let send_val = this.getValue();
-           let optprm   = this.optionParam();
-           if (null !== optprm) {
-               for (let oidx in optprm) {
-                   send_val[oidx] = optprm[oidx];
-               }
-           }
-           /* send post */
-           xhr.send(JSON.stringify(send_val));
-        } catch (e) {
-            console.error(e.stack);
-            throw e;
-        }
-    }
-    
+//    submit () {
+//        try {
+//            
+//	} catch (e) {
+//            console.error(e.stack);
+//            throw e;
+//        }
+//    }
+
     /**
      * send function setter/getter
      * 
@@ -260,9 +207,9 @@ module.exports = class extends mofron.class.Component {
      * @return (array) function list [(fucntion,parameter)]
      * @type parameter
      */
-    sendfunc (fnc, prm) {
+    submitFunc (fnc, prm) {
         try {
-            return this.confmng("sendfunc", fnc, prm);
+            return this.confmng("submitFunc", fnc, prm);
 	} catch (e) {
             console.error(e.stack);
             throw e;
@@ -380,7 +327,10 @@ module.exports = class extends mofron.class.Component {
             if (true === comutl.iscmp(prm)) {
                 let clk = (p1,p2,p3) => {
                     try {
-		        p3.send();
+		        let fnc = p3.submitFunc();
+			if (null !== fnc) {
+                            fnc[0](p3,fnc[1]);
+			}
                     } catch (e) {
                         console.error(e.stack);
                         throw e;
