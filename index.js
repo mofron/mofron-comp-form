@@ -69,7 +69,7 @@ module.exports = class extends mofron.class.Component {
             
             /* add enter key event */
             this.initKeyEvent();
-            this.width("100%");
+            this.width("100%", { private:true });
         } catch (e) {
             console.error(e.stack);
             throw e;
